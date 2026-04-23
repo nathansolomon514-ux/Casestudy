@@ -1,0 +1,355 @@
+body {
+    margin: 0;
+    font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+    height: 500vh;
+    box-sizing: border-box;
+    overflow-x: hidden;
+}
+
+
+.nav-bar {
+    background-image: url(Resources/Images/original-f0af2d76d7eb798602d2fe67643201aa.gif);
+    height: 100vh;
+    width: 100%;
+    background-position: top -2% center;
+}
+
+.tap-area {
+    --tap-area-size: 2.25rem;
+    position: relative;
+}
+
+.button_header  {
+    padding-inline: 8px 8px 8px 8px;
+    padding-block: 4px 0 4px 0;
+    min-height: 32px;
+    margin-inline-start: 8px;
+    -webkit-margin-start: 8px;
+    box-sizing: border-box;
+    border: 1px solid black;
+}
+
+/* Change sticky to fixed for a global navbar */
+.header-primary {
+    display: flex;
+    width: 100%; /* Use 100% instead of 100vw to avoid scrollbar overlap */
+    position: fixed; 
+    top: 0;
+    left: 0;
+    justify-content: space-between;
+    z-index: 1000;
+    background-color: transparent;
+    transition: all 0.4s ease, box-shadow 0.4s ease; /* Smooth transition for your scroll effect */
+}
+
+.header-primary ul {
+    display: flex;
+    list-style: none;
+}
+
+.header-primary a {
+    display: flex;
+    color: white;
+    padding: 15px 0 0 15px;
+    display: block;
+    text-decoration: none;
+    text-align: center;
+    font-size: x-large;
+    font-weight: 700;
+    user-select: none;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+}
+
+.header-primary a img {
+    width: 150px !important; /* Forces the width to stay 150px */
+    height: auto; 
+    object-position: top;
+    transition: filter 0.4s ease; /* Smooth color transition */
+    object-fit: contain; /* Keeps the proportions correct */
+}
+
+.header-primary.scrolled {
+    background-color: black;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.header-primary.scrolled a {
+    color: #fff;
+}
+
+.header-primary.scrolled .menu-btn span {
+    background: #fff;
+}
+
+
+/* Hide the black logo by default */
+.logo-black {
+    display: none;
+}
+
+/* When the user scrolls... */
+.header-primary.scrolled .logo-white {
+    display: none;
+}
+
+.header-primary.scrolled .logo-black {
+    display: block;
+}
+
+.header-primary.scrolled a img {
+    width: 150px;
+    height: auto;
+}
+
+.header__logo {
+    display: flex;
+    grid-area: logo;
+    justify-self: start;
+    position: relative;
+}
+    
+
+.header__logo {
+    width: var(--header-logo-width);
+    max-width: 100%;
+    height: auto;
+    opacity: calc(1 - var(--header-show-transparent-logo));
+    transition: opacity .2s ease-in-out;
+}
+
+/* Menu Button */
+.menu-btn {
+    width: 5px;
+    height: 17px;
+    position: relative;
+    cursor: pointer;
+    background: none;
+    border: none;
+    top: 15px;
+    left: 15px;
+}
+
+/* The 3 lines */
+.menu-btn span {
+    position: absolute;
+    width: 25px;
+    height: 2px;
+    background: #faf8f8;
+    left: 0;
+    transition: 0.3s;
+}
+
+/* Position lines */
+.menu-btn span:nth-child(1) {
+    top: 0;
+}
+.menu-btn span:nth-child(2) {
+    top: 50%;
+    transform: translateY(-50%);
+}
+.menu-btn span:nth-child(3) {
+    bottom: 0;
+}
+
+/* Transform into X */
+.menu-btn.active span:nth-child(1) {
+    top: 50%;
+    transform: translateY(-50%) rotate(45deg);
+}
+
+.menu-btn.active span:nth-child(2) {
+    opacity: 0;
+}
+
+.menu-btn.active span:nth-child(3) {
+    top: 50%;
+    bottom: auto; /* IMPORTANT */
+    transform: translateY(-50%) rotate(-45deg);
+}
+
+/* Sidebar */
+.sidebar {
+    width: 220px;
+    height: 100vh;
+    background: #000000;
+    position: fixed;
+    top: 0;
+    left: -220px;
+    transition: 0.3s;
+    padding-top: 60px;
+    border-right: 0.1px solid #ffffffda;
+}
+
+.sidebar.active {
+    left:0;
+}
+
+.sidebar a {
+    display: block;
+    color: white;
+    padding: 12px 20px;
+    text-decoration: none;
+    transition:all 0.5s ease;
+    font-family: "Anton", serif;
+    font-weight: 700;
+    letter-spacing: 5px;
+    font-size: 30px;
+    text-transform: uppercase;
+}
+
+.sidebar a:hover {
+    color: #3b3535;
+}
+
+/* Sidebar */
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: -220px;
+    width: 220px;
+    height: 100vh;
+    background: #000000;
+    transition: 0.3s;
+    padding-top: 60px;
+}
+
+.sidebar.active {
+    left: 0;
+}
+
+/* INSIDE button (X position) */
+.menu-btn.inside {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+}
+
+/*Containers*/
+.First-container {
+    display: flex;              /* puts items in a row */
+    gap: 20px;                  /* space between products */
+    padding: 20px;
+    justify-content: center;    /* center them horizontally */
+    flex-wrap: wrap;            /* moves to next row if needed */
+}
+
+
+.product-card {
+    width: 200px;
+    padding: 15px;
+    border: 1px solid #ffffff;
+    border-radius: 10px;
+    text-align: center;
+    background: rgb(255, 255, 255);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+
+.product-card img {
+    width: 100%;
+    border-radius: 8px;
+}
+
+.background-btn a {
+    text-decoration: none; 
+    display: inline-flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+
+    padding: 12px 20px;
+    font-size: 16px;
+    font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+    color: #000000;
+
+    background: #ffffff;
+    border: 1.9px solid black;
+    cursor: pointer;
+}
+/* Background Button*/
+.background-btn .Men{
+  position: absolute;
+  bottom: 70px;
+  left: 70px;
+
+  box-shadow: 5px 5px 0px rgb(255, 255, 255);
+}
+
+.background-btn .Women{
+  position: absolute;
+  bottom: 70px;
+  left: 200px;
+
+  box-shadow: 5px 5px 0px rgb(255, 255, 255);
+
+}
+/* Arrow */
+.background-btn  .arrow {
+  font-size: 18px;
+  transition: transform 0.2s ease;
+}
+
+/* Hover effect */
+.background-btn a:hover .arrow {
+  transform: translateX(5px);
+}
+
+/* Rename your background container */
+.hero-section {
+    background-image: url(Resources/Images/your-gif.gif);
+    height: 100vh;
+    width: 100%;
+    background-position: center;
+    background-size: cover; /* Ensures image fills the screen */
+    display: flex;
+    position: relative;
+}
+
+/* Ensure the navbar links are visible when the 'scrolled' class hits */
+.header-primary.scrolled {
+    background-color: white;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.header-primary.scrolled a {
+    color: black; /* Change text color so it's visible on white bg */
+}
+
+.header-primary.scrolled .menu-btn span {
+    background: black; /* Change burger menu color on scroll */
+}
+
+
+/* Promo Banner Styles */
+.promo-banner {
+    width: 100%;
+    margin-bottom: 30px;
+    text-align: left; /* Aligns boxes to the left like your image */
+}
+
+/* The "MEMBERS GET MORE" box */
+.promo-title span {
+    background-color: white;
+    color: black;
+    padding: 5px 15px;
+    font-family: "Anton", serif; /* Uses your site's heading font */
+    font-size: 38px;
+    text-transform: uppercase;
+    display: inline-block;
+    line-height: 1.2;
+    border: 1px solid black; /* Optional: adds definition */
+}
+
+/* The smaller description boxes */
+.promo-subtitle span {
+    background-color: white;
+    color: black;
+    padding: 4px 10px;
+    font-family: Arial, sans-serif;
+    font-size: 18px;
+    display: inline-block;
+    margin-top: 5px; /* Creates the gap between the stacked boxes */
+    line-height: 1.5;
+}
