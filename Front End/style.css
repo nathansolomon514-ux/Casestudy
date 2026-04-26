@@ -12,6 +12,98 @@ body {
     height: 100vh;
     width: 100%;
     background-position: top -2% center;
+
+    /* This makes the image cover the entire screen without stretching weirdly */
+    background-size: cover; 
+    
+    /* This keeps the image centered */
+    background-position: center; 
+    
+    /* This prevents the image from repeating if it's too small */
+    background-repeat: no-repeat; 
+    
+}
+
+/* Container for the right side of the nav */
+.nav-right {
+    padding-right: 40px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Base style for the Profile Icon */
+.profile-icon {
+    width: 28px;
+    height: 40px;
+    color: white; /* Matches your white nav links */
+    transition: 0.3s ease;
+    display: block;
+}
+
+/* Change profile icon to black when scrolling */
+.header-primary.scrolled .profile-icon {
+    color: black;
+}
+
+/* Reset any default link styling */
+.profile-btn {
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    border: none !important;
+    background: none !important;
+}
+
+/* Hover effect */
+.profile-btn:hover .profile-icon {
+    opacity: 0.7;
+}
+
+/* Container for the icon and badge */
+.cart-icon-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+/* The Shopping Bag Icon */
+.bag-icon {
+    width: 28px;
+    height: 28px;
+    color: white; /* Matches your white nav links */
+    transition: 0.3s;
+}
+
+/* When the navbar scrolls, change icon color to black */
+.header-primary.scrolled .bag-icon {
+    color: black;
+}
+
+/* The Number Badge */
+.cart-badge {
+    position: absolute;
+    top: -5px;      /* Pulls it slightly above the bag */
+    right: -8px;    /* Pulls it slightly to the right */
+    background-color: #17e600; /* Use your brand's bright green */
+    color: black;
+    font-size: 10px;
+    font-weight: bold;
+    min-width: 16px;
+    height: 16px;
+    border-radius: 50%; /* Makes it a circle */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2px;
+    font-family: sans-serif;
+}
+
+/* Clean up your old cart-btn borders */
+.cart-btn {
+    border: none !important; /* Removes the white box border you had */
+    padding: 0;
+    display: flex;
+    align-items: center;
 }
 
 .tap-area {
@@ -39,6 +131,7 @@ body {
     justify-content: space-between;
     z-index: 1000;
     background-color: transparent;
+    padding: 10px 20px;
     transition: all 0.4s ease, box-shadow 0.4s ease; /* Smooth transition for your scroll effect */
 }
 
@@ -62,12 +155,19 @@ body {
     padding: 10px;
 }
 
+.header-primary > a {
+    flex: 0; /* Don't let the logo container grow */
+    display: flex;
+    justify-content: center;
+}
+
 .header-primary a img {
     width: 150px !important; /* Forces the width to stay 150px */
     height: auto; 
     object-position: top;
     transition: filter 0.4s ease; /* Smooth color transition */
     object-fit: contain; /* Keeps the proportions correct */
+    padding-left: 100px;
 }
 
 .header-primary.scrolled {
@@ -103,6 +203,7 @@ body {
     height: auto;
 }
 
+
 .header__logo {
     display: flex;
     grid-area: logo;
@@ -122,20 +223,20 @@ body {
 /* Menu Button */
 .menu-btn {
     width: 5px;
-    height: 17px;
+    height: 20px;
     position: relative;
     cursor: pointer;
     background: none;
     border: none;
     top: 15px;
-    left: 15px;
+    left: 5px;
 }
 
 /* The 3 lines */
 .menu-btn span {
     position: absolute;
     width: 25px;
-    height: 2px;
+    height: 3px;
     background: #faf8f8;
     left: 0;
     transition: 0.3s;
@@ -207,16 +308,107 @@ body {
 .sidebar {
     position: fixed;
     top: 0;
-    left: -220px;
-    width: 220px;
+    left: -270px;
+    width: 270px;
     height: 100vh;
     background: #000000;
     transition: 0.3s;
-    padding-top: 60px;
+
+    /* CHANGE THIS: Increase from 60px to 100px or more */
+    padding-top: 90px;
+    z-index: 999; /* Ensures it stays under the header if needed */
 }
 
 .sidebar.active {
     left: 0;
+}
+
+/* Sidebar Search Container */
+.sidebar-search {
+    padding: 0 20px 20px 20px; /* Adds spacing around the input */
+}
+
+.sidebar-search input {
+    width: 100%;
+    background: transparent;
+    border: 1px solid #ffffff;
+    color: white;
+    padding: 10px;
+    font-family: "Anton", serif;
+    font-size: 16px;
+    letter-spacing: 1px;
+    outline: none;
+    box-sizing: border-box;
+    transition: 0.3s;
+}
+
+.sidebar-search input::placeholder {
+    color: #888;
+}
+
+.sidebar-search input:focus {
+    border-color: #3b3535; /* Subtle change on click */
+    background: #1a1a1a;
+}
+
+
+/* 1. Make the container a reference point */
+.sidebar-search {
+    position: relative;
+    padding: 0 20px 20px 20px;
+}
+
+/* 2. Position the icon inside the box */
+.search-icon {
+    position: absolute;
+    left: 32px; /* Moves it inside the left edge of the input */
+    top: 10px;  /* Centers it vertically */
+    color: #888;
+    font-size: 14px;
+    pointer-events: none; /* Allows you to click "through" the icon to type */
+}
+
+/* 3. Indent the input text so it starts after the icon */
+.sidebar-search input {
+    width: 100%;
+    background: transparent;
+    border: 1px solid #ffffff;
+    color: white;
+    padding: 10px 10px 10px 35px; /* Added 35px padding to the LEFT */
+    font-family: "Anton", serif;
+    font-size: 16px;
+    letter-spacing: 1px;
+    outline: none;
+    box-sizing: border-box;
+    transition: 0.3s;
+}
+
+/* This makes the results float over your 'Shop Now' and 'Categories' links */
+.search-dropdown {
+    position: absolute;
+    top: 45px; /* Adjust based on your input height */
+    left: 20px;
+    right: 20px;
+    background-color: #1a1a1a; /* Dark background to match sidebar */
+    border: 1px solid #ffffff;
+    max-height: 250px;
+    overflow-y: auto;
+    z-index: 100;
+    display: none; /* Hidden until user types */
+}
+
+.search-dropdown a {
+    color: white;
+    padding: 12px;
+    text-decoration: none;
+    display: block;
+    font-family: "Anton", serif;
+    font-size: 14px;
+    border-bottom: 1px solid #333;
+}
+
+.search-dropdown a:hover {
+    background-color: #333;
 }
 
 /* INSIDE button (X position) */
@@ -235,9 +427,31 @@ body {
     flex-wrap: wrap;            /* moves to next row if needed */
 }
 
+/* The container that holds all cards */
+.KRNK-PRODUCTS {
+    display: flex;
+    flex-wrap: wrap;    /* Allows cards to move to the next line on small screens */
+    gap: 20px;          /* Space between cards */
+    padding: 20px;
+    justify-content: center; /* Centers the cards on the page */
+}
+
+/* Hide all product sections by default */
+.KRNK-PRODUCTS {
+    display: none; 
+    flex-wrap: wrap;
+    gap: 20px;
+    padding: 20px;
+    justify-content: center;
+}
+
+/* Show the section that has the 'active' class */
+.KRNK-PRODUCTS.active {
+    display: flex;
+}
 
 .product-card {
-    width: 200px;
+    width: 300px;
     padding: 15px;
     border: 1px solid #ffffff;
     border-radius: 10px;
@@ -252,6 +466,34 @@ body {
     border-radius: 8px;
 }
 
+/* Styling for the Add to Cart button */
+.product-card button {
+    background-color: #000;      /* Solid black background */
+    color: #fff;                 /* White text */
+    border: none;
+    padding: 12px 20px;          /* Bigger clickable area */
+    width: 100%;                 /* Makes it span the width of the card */
+    font-family: 'Anton', sans-serif; /* Matches your logo/headings */
+    font-size: 16px;
+    text-transform: uppercase;   /* Bold, athletic look */
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: all 0.3s ease;   /* Smooth hover effect */
+    margin-top: 15px;
+    border-radius: 4px;          /* Slight roundness */
+}
+
+/* Quality Hover Effect */
+.product-card button:hover {
+    background-color: #333;      /* Slightly lighter grey/black */
+    letter-spacing: 2px;         /* Expands slightly for visual feedback */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* Active "Click" Effect */
+.product-card button:active {
+    transform: scale(0.96);      /* Button physically presses down */
+}
 .background-btn a {
     text-decoration: none; 
     display: inline-flex;
@@ -329,6 +571,9 @@ body {
     text-align: left; /* Aligns boxes to the left like your image */
 }
 
+.promo-title {
+    user-select: none;
+}
 /* The "MEMBERS GET MORE" box */
 .promo-title span {
     background-color: white;
@@ -352,4 +597,53 @@ body {
     display: inline-block;
     margin-top: 5px; /* Creates the gap between the stacked boxes */
     line-height: 1.5;
+}
+
+.promo-buttons {
+    margin-top: 20px;
+    display: flex;
+    gap: 10px; /* Space between the two buttons */
+}
+
+.promo-btn {
+    display: inline-block;
+    background-color: white;
+    color: black;
+    text-decoration: none;
+    padding: 10px 25px;
+    font-family: Arial, sans-serif;
+    font-weight: bold;
+    font-size: 14px;
+    transition: 0.3s ease;
+    border: 1px solid black;
+}
+
+.promo-btn:hover {
+    background-color: black;
+    color: white;
+}
+
+/* Dropdown hidden by default */
+.dropdown-content {
+    display: none;
+    background-color: #1a1a1a; /* Slightly lighter than sidebar bg */
+    padding-left: 20px; /* Indent sub-items */
+}
+
+/* Show the dropdown when it has an 'active' class */
+.dropdown-content.show {
+    display: block;
+}
+
+/* Style the sub-links specifically */
+.dropdown-content a {
+    font-size: 20px; /* Smaller than main links */
+    letter-spacing: 2px;
+    padding: 8px 20px;
+}
+
+/* Optional: Rotate the arrow when active */
+.dropdown-btn.active .arrow-down {
+    display: inline-block;
+    transform: rotate(180deg);
 }
