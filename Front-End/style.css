@@ -79,23 +79,69 @@ body {
     color: black;
 }
 
-/* The Number Badge */
-.cart-badge {
-    position: absolute;
-    top: -5px;      /* Pulls it slightly above the bag */
-    right: -8px;    /* Pulls it slightly to the right */
-    background-color: #17e600; /* Use your brand's bright green */
-    color: black;
-    font-size: 10px;
-    font-weight: bold;
-    min-width: 16px;
-    height: 16px;
-    border-radius: 50%; /* Makes it a circle */
+.cart-toast {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    background: rgba(20, 20, 20, 0.95); /* Darker glass effect */
+    border-left: 4px solid #17e600; /* Neon accent */
+    padding: 15px 25px;
+    min-width: 250px;
+    z-index: 9999999; /* Ensure it stays above the modal */
+    
+    /* Animation setup */
+    transform: translateX(120%); 
+    transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+.cart-toast.show {
+    transform: translateX(0);
+}
+
+.toast-header {
     display: flex;
     align-items: center;
+    gap: 10px;
+    margin-bottom: 4px;
+}
+
+.toast-check {
+    color: #17e600;
+    font-weight: bold;
+}
+
+.toast-msg {
+    color: #17e600;
+    font-family: 'Anton', sans-serif;
+    font-size: 14px;
+    letter-spacing: 1px;
+    margin: 0;
+}
+
+.toast-item {
+    color: white;
+    font-size: 12px;
+    margin: 0;
+    opacity: 0.8;
+    text-transform: uppercase;
+}
+
+.cart-badge {
+    /* Ensure this matches your HTML structure */
+    position: absolute;
+    top: -5px;
+    right: -10px;
+    background: #17e600;
+    color: black;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    display: none; /* Starts hidden */
+    align-items: center;
     justify-content: center;
-    padding: 2px;
-    font-family: sans-serif;
+    font-size: 11px;
+    font-weight: bold;
 }
 
 /* Clean up your old cart-btn borders */
@@ -646,4 +692,738 @@ body {
 .dropdown-btn.active .arrow-down {
     display: inline-block;
     transform: rotate(180deg);
+}
+
+/* Full screen dark overlay */
+.modal-overlay {
+    display: none; 
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.95);
+    z-index: 5000;
+    justify-content: center;
+    align-items: center;
+}
+
+/* The sharp black login box */
+.login-title {
+    font-family: 'Anton', sans-serif;
+    color: #fff;
+    font-size: 32px;
+    letter-spacing: 2px;
+    margin-bottom: 30px;
+}
+
+.login-card input {
+    width: 100%;
+    padding: 15px;
+    margin-bottom: 15px;
+    background: #111;
+    border: 1px solid #333;
+    color: #fff;
+    box-sizing: border-box;
+}
+
+.login-submit {
+    width: 100%;
+    padding: 15px;
+    background: #fff;
+    color: #000;
+    border: none;
+    font-family: 'Anton', sans-serif;
+    font-size: 18px;
+    cursor: pointer;
+    transition: 0.3s ease;
+}
+
+.login-submit:hover {
+    background: #17e600; /* Your brand's green */
+}
+
+.close-modal-btn {
+    background: none;
+    border: none;
+    color: #666;
+    margin-top: 25px;
+    cursor: pointer;
+    text-transform: uppercase;
+    font-size: 11px;
+    letter-spacing: 1px;
+}
+
+/* Expand the card size and split it */
+.login-card {
+    background: #000;
+    width: 900px; /* Larger width for the split view */
+    max-width: 95%;
+    display: flex; /* Side-by-side layout */
+    overflow: hidden;
+    position: relative;
+    /* offset-x | offset-y | blur-radius | spread-radius | color */
+    box-shadow: 0 10px 50px rgba(255, 255, 255, 0.15);
+    border-radius: 2%;
+    position: relative;
+}
+
+/* Left side (Visual) */
+.auth-visual {
+    flex: 1;
+    background: #111;
+    border-right: 1px solid #222;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.auth-visual img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Makes the GIF cover the whole left area */
+}
+
+/* Right side (Form) */
+.auth-content {
+    flex: 1;
+    padding: 60px; /* More breathing room */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    position: relative; /* Add this */
+    z-index: 5;         /* Add this */
+}
+
+.auth-tabs {
+    display: flex;
+    justify-content: space-around;
+    border-bottom: 1px solid #333;
+    margin-bottom: 40px;
+    gap: 30px;
+}
+
+.auth-tabs span {
+    font-family: 'Anton', sans-serif;
+    font-size: 24px; /* Larger tabs */
+    letter-spacing: 2px;
+    cursor: pointer;
+    color: #444;
+    transition: 0.3s;
+}
+
+.auth-tabs span.active {
+    color: white;
+}
+
+input {
+    width: 100%;
+    background: #0a0a0a;
+    border: 1px solid #333;
+    padding: 18px; /* Bigger touch target */
+    margin-bottom: 15px;
+    color: white;
+    font-size: 14px;
+    letter-spacing: 1px;
+    outline: none;
+}
+
+input:focus {
+    border-color: #17e600;
+}
+
+.login-submit {
+    width: 100%;
+    height: 65px; /* Larger button */
+    background: white;
+    color: black;
+    font-family: 'Anton', sans-serif;
+    font-size: 20px;
+    border: none;
+    cursor: pointer;
+    margin-top: 20px;
+    transition: 0.3s;
+}
+
+.login-submit:hover {
+    background: white;
+}
+
+/* Error message styling */
+.error-msg {
+    color: #ff4d4d;
+    font-size: 13px;
+    margin-bottom: 15px;
+    font-weight: bold;
+}
+
+/* Makes the detail view take up the WHOLE screen */
+.product-detail-card {
+    background: #000;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    position: relative;
+    overflow-y: auto; /* Allows scrolling if content is tall */
+    padding: 0;
+}
+
+.product-layout {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr; /* Image left (60%), Content right (40%) */
+    width: 100%;
+    min-height: 100vh;
+}
+
+.product-image-box {
+    background: #f5f5f5; 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    position: sticky;
+    top: 0;
+}
+
+.product-image-box img {
+    max-width: 80%;
+    height: auto;
+}
+
+.product-info-box {
+    padding: 80px 60px; /* More space for the "Nike" look */
+    color: #fff;
+    text-align: left;
+}
+
+/* Close button for full screen */
+.close-view {
+    position: fixed;
+    top: 30px;
+    right: 40px;
+    background: #fff;
+    color: #000;
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    font-size: 20px;
+    cursor: pointer;
+    z-index: 10001;
+}
+
+/* The container for the buttons */
+.option-group {
+    margin-top: 40px;
+}
+
+.option-group label {
+    font-family: 'Anton', sans-serif;
+    font-size: 14px;
+    letter-spacing: 3px;
+    color: #888; /* Dim the label to make the buttons pop */
+    display: block;
+    margin-bottom: 15px;
+}
+
+/* Big Gender Buttons */
+.gender-options {
+    display: flex;
+    gap: 15px;
+}
+
+.gender-options button {
+    flex: 1; /* Makes them equal width */
+    padding: 20px;
+    background: transparent;
+    border: 1px solid #333;
+    color: #fff;
+    font-family: 'Anton', sans-serif;
+    font-size: 18px;
+    cursor: pointer;
+    transition: 0.3s ease;
+}
+
+/* Huge Size Grid */
+.size-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* 3 in a row */
+    gap: 12px;
+}
+
+.size-grid button {
+    padding: 25px 0; /* Tall buttons */
+    background: transparent;
+    border: 1px solid #333;
+    color: #fff;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+/* The Active State (When Clicked) */
+.gender-options button.active, 
+.size-grid button.active {
+    background: #fff !important;
+    color: #000 !important;
+    border-color: #fff !important;
+}
+
+/* Add to Bag Button (The Main Event) */
+.add-to-cart-btn {
+    width: 100%;
+    height: 70px; /* Thicc */
+    margin-top: 50px;
+    background: #fff;
+    color: #000;
+    border: none;
+    font-family: 'Anton', sans-serif;
+    font-size: 22px;
+    letter-spacing: 2px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.add-to-cart-btn:hover {
+    background: #17e600; /* KRNK Neon Green */
+}
+
+.product-card {
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+.product-card:hover {
+    transform: translateY(-10px); /* Lift up slightly */
+    filter: brightness(1.1);
+}
+
+.slider-container {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+}
+
+.variant-nav {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.variant-scroll {
+    position: absolute;
+    bottom: 20px;       /* Distance from the bottom edge */
+    left: 20px;         /* Distance from the left edge */
+    display: flex;
+    flex-direction: row; /* Keep them in a line */
+    gap: 20px;
+    background: rgba(0, 0, 0, 0.4); /* Subtle dark overlay so they pop */
+    padding: 8px;
+    border-radius: 4px;
+    z-index: 10;
+    max-width: 80%;     /* Prevents them from hitting the right side */
+    overflow-x: auto;
+    scrollbar-width: none;
+}
+
+.variant-thumb.active {
+    border: 2px solid #000;
+}
+
+.nav-arrow {
+    background: #000;
+    color: #fff;
+    border: 1px solid #fff;
+    border-radius: 50%;
+    width: 35px;
+    height: 35px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+}
+
+.nav-arrow:hover {
+    background: #fff;
+    color: #000;
+}
+
+#viewTitle {
+    min-height: 80px; /* Adjust based on your font size */
+    display: flex;
+    align-items: center;
+    text-transform: uppercase;
+}
+
+/* Container for the slider */
+.thumbnail-gallery {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto; /* Enables the horizontal scroll */
+    padding: 15px 0;
+    scrollbar-width: thin; /* For Firefox */
+}
+
+/* Customizing the scrollbar to be subtle */
+.thumbnail-gallery::-webkit-scrollbar {
+    height: 4px;
+}
+
+.thumbnail-gallery::-webkit-scrollbar-thumb {
+    background: #17e600; /* KRNK Neon Green */
+    border-radius: 10px;
+}
+
+/* Hide the actual scrollbar track so it looks like the reference */
+.variant-scroll::-webkit-scrollbar {
+    display: none; 
+}
+
+/* Slightly smaller thumbnails to fit the corner look */
+.variant-thumb {
+    width: 90px;
+    height: 90x;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    cursor: pointer;
+    flex-shrink: 0;
+    object-fit: cover;
+}
+
+.variant-thumb.active {
+    border: 2px solid #17e600; /* Neon Green highlight */
+}
+
+/* Hide the real mouse over the image box */
+.product-image-box {
+    position: relative;
+    cursor: none; /* This hides the default white arrow */
+}
+/* Base hitbox style */
+.nav-hitbox {
+    position: absolute;
+    top: 0;
+    width: 50%; /* Splitting the image in half */
+    height: 100%;
+    z-index: 5; /* Above the image, but below thumbnails */
+}
+
+/* LEFT SIDE: Arrow points Left */
+.nav-hitbox.left {
+    left: 0;
+    cursor: w-resize; 
+}
+
+/* RIGHT SIDE: Arrow points Right */
+.nav-hitbox.right {
+    right: 0;
+    cursor: e-resize;
+}
+
+/* Ensure thumbnails remain clickable */
+.variant-scroll {
+    z-index: 10; 
+}
+
+.product-image-box {
+    position: relative;
+    cursor: none !important; /* Forces the real mouse to hide */
+}
+
+/* Ensure thumbnails and buttons STILL show a normal mouse */
+.variant-scroll, .option-btn, .login-submit, .close-view {
+    cursor: auto !important;
+}
+
+.product-image-box {
+    position: relative;
+    cursor: none !important; /* Hides the real mouse */
+}
+
+/* IMPORTANT: Give the mouse back when over thumbnails */
+.variant-scroll, .variant-thumb, .close-view, .option-btn {
+    cursor: auto !important;
+}
+
+/* Hide the real mouse on the image and the navigation zones */
+.product-image-box, 
+.nav-zone, 
+.nav-hitbox {
+    cursor: none !important;
+}
+
+/* BUT, give the mouse back when hovering over the thumbnails or buttons */
+.variant-scroll, 
+.variant-thumb, 
+.option-btn, 
+.login-submit, 
+.close-view {
+    cursor: auto !important;
+}
+
+#custom-cursor {
+    position: fixed;
+    pointer-events: none;
+    z-index: 999999;
+    display: none;
+    /* Center the circle on the mouse tip */
+    transform: translate(-50%, -50%); 
+}
+
+.cursor-circle {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.3); /* Subtle dark fill */
+    /* These three lines keep the arrow centered inside the circle */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#cursor-arrow {
+    color: solid white;
+    font-size: 50px;
+    font-weight: bold;
+    line-height: 1;
+    display: inline-block; /* Required for rotation to work */
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* The "turning" animation */
+}
+
+.product-image-box {
+    position: relative;
+    cursor: none !important; /* Hide system mouse */
+}
+
+.cart-sidebar {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 400px;
+    height: 100%;
+    background: #000; /* Pure black for that elite look */
+    z-index: 100001;
+    transform: translateX(100%);
+    transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    display: flex;
+    flex-direction: column; /* Keeps header top, footer bottom */
+    padding: 30px;
+    box-sizing: border-box;
+    border-left: 1px solid #17e600;
+}
+
+.cart-sidebar.active {
+    transform: translateX(0);
+}
+
+.cart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 40px;
+}
+
+.cart-header h2 {
+    color: white;
+    font-size: 28px;
+    margin: 0;
+}
+
+.close-cart {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 12px;
+    letter-spacing: 2px;
+    cursor: pointer;
+    opacity: 0.6;
+}
+
+.cart-body {
+    flex-grow: 1; /* Pushes the footer down */
+    overflow-y: auto;
+}
+
+.cart-footer {
+    border-top: 1px solid #222;
+    padding-top: 20px;
+}
+
+.total-section {
+    display: flex;
+    justify-content: space-between;
+    color: white;
+    margin-bottom: 20px;
+}
+
+.continue-link {
+    color: #17e600;
+    text-decoration: none;
+    font-size: 12px;
+    text-transform: uppercase;
+}
+
+.checkout-btn {
+    width: 100%;
+    padding: 18px;
+    background: white;
+    color: black;
+    border: none;
+    font-family: 'Anton', sans-serif;
+    font-size: 16px;
+    font-weight: bolder;
+    cursor: pointer;
+
+}
+
+.cart-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.85);
+    backdrop-filter: blur(4px);
+    display: none;
+    z-index: 100000;
+}
+
+.empty-bag {
+    color: White;
+}
+
+.cart-item-row {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 15px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.cart-item-img {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border: 1px solid #333;
+}
+
+.cart-item-info {
+    flex-grow: 1;
+}
+
+.cart-item-name {
+    color: white;
+    font-size: 14px;
+    margin: 0 0 5px 0;
+    letter-spacing: 1px;
+}
+
+.cart-item-price {
+    color: #17e600; /* Neon Green */
+    font-size: 13px;
+    margin: 0;
+}
+
+.remove-item {
+    background: none;
+    border: none;
+    color: #ff4d4d; /* Red for remove */
+    font-size: 10px;
+    letter-spacing: 1px;
+    cursor: pointer;
+    opacity: 0.6;
+}
+
+.remove-item:hover { opacity: 1; }
+
+
+.quantity-selector {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.qty-btn {
+    width: 40px;
+    height: 40px;
+    background: #111;
+    border: 1px solid #333;
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.qty-btn:hover {
+    border-color: #17e600;
+    color: #17e600;
+}
+
+#productQty {
+    width: 60px;
+    height: 40px;
+    background: none;
+    border: 1px solid #17e600;
+    color: white;
+    text-align: center;
+    font-family: 'Anton', sans-serif;
+    font-size: 18px;
+    outline: none;
+}
+
+/* Remove arrows/spinners from the input */
+#productQty::-webkit-inner-spin-button,
+#productQty::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.close-auth {
+    position: absolute;
+    top: 20px;
+    right: 25px;
+    background: none;
+    border: none;
+    color: white;
+    font-size: 35px; /* Large and clear */
+    cursor: pointer;
+    z-index: 10; /* Ensures it stays on top of the GIF/Form */
+    line-height: 1;
+    transition: 0.3s ease;
+    opacity: 0.6;
+}
+
+.close-auth:hover {
+    color: #17e600; /* Glows green on hover */
+    opacity: 1;
+    transform: scale(1.1);
+}
+
+/* Force the container to be the boss */
+.form-wrapper {
+    position: relative;
+    width: 100%;
+    min-height: 300px; /* Adjust based on your form height */
+}
+
+#loginForm, #registerForm {
+    width: 100%;
+    transition: opacity 0.3s ease;
+}
+
+/* When a form is hidden, it MUST NOT exist for the mouse */
+form[style*="display: none"] {
+    pointer-events: none !important;
+    user-select: none;
+    visibility: hidden; 
+}
+
+/* Ensure the submit button has a high priority */
+.login-submit {
+    position: relative;
+    z-index: 999;
+    cursor: pointer !important;
 }
