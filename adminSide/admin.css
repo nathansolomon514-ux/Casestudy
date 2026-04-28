@@ -1,0 +1,64 @@
+
+        /*Keeps the entire body on Arial or Sans Serif font and margin auto to center the body*/
+        body { 
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4; 
+            margin: 0;
+        }
+
+        /*Styles the login container and keeps it at the center by margin auto*/
+        .login-container { 
+            background: white; 
+            padding: 20px; 
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            width: 300px; 
+            margin: 100px auto;
+        }
+        
+        /*Styles the text input buttons and ensures that the inputs are centered*/
+        .login-input { 
+            width: 100%; 
+            padding: 10px; 
+            margin-top: 10px; 
+            margin-bottom: 5px; 
+            border: 1px solid #ccc; 
+            border-radius: 5px; 
+            box-sizing: border-box;
+        }
+
+        /*Styles the login button also ensures that it is centered.*/
+        .login-button { 
+            width: 100%; 
+            padding: 10px; 
+            background: #007bff; 
+            color: white; border: none; 
+            border-radius: 4px; 
+            cursor: pointer; 
+        }
+
+
+        /*Changes login button color on hover*/
+        .login-button:hover { 
+            background: #0056b3; 
+        }
+
+    /*Makes it so that the header is centered*/
+        .header {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            padding-top: 15px;
+            padding-bottom: 15px;
+            padding-right: 0px;
+            padding-left: 0px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            background-color: black;
+            margin: 0;
+        }
+
+        /**/
+        .logo-black {
+            width: 180px;
+            height: auto;
+        }
