@@ -1,0 +1,130 @@
+    /*Makes it so that the header is centered*/
+    .header {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        padding-top: 15px;
+        padding-bottom: 15px;
+        padding-right:0px;
+        padding-left: 0px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        background-color: black;
+        margin: 0;
+    }
+
+    /*Changes logo size*/
+    .logo-black {
+        width: 180px;
+        height: auto;
+        flex: 0 1 auto;
+    }
+
+    /*Keeps the entire body on Arial or Sans Serif font*/
+    body { 
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4; 
+        margin: 0;
+    }
+
+    h3{
+        margin: 20px 0;
+        text-align: center;
+        width: 100%;
+    }
+
+    .navHeader {
+        justify-content: center;
+    }
+
+    /* Add a black background color to the top navigation */
+    nav {
+        width: 100%;
+        display: flex;  
+        background-color: black;
+        overflow: hidden;
+        justify-content: center;
+    }
+
+    /* Style the links inside the navigation bar */
+    nav a {
+        float: left;
+        color: #f2f2f2;
+        text-align: center;
+        padding: 14px 16px;
+        text-decoration: none;
+        font-size: 17px;
+    }
+
+    /* Change the color of links on hover */
+    nav a:hover {
+        background-color: #ddd;
+        color: black;
+        }
+
+/*Centers the Hello Admin blah blah*/
+    .welcomeAdmin {
+        height: 60px;
+        position: relative;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+ /*Centers everything inside the main tag*/
+    .dashboardContent{
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding-top: 20px;
+        padding-bottom: 20px;
+        padding-right:0px;
+        padding-left: 0px;
+        width: 100%;
+        gap: 30px;
+} 
+
+    /*Makes a card-like appearance*/
+    .dashboardStatistics {
+        display: flex;
+        justify-content: center;
+        gap: 25px;
+        width: 95%;
+        max-width: 1100px;
+        flex-wrap: wrap;
+        margin-bottom: 40px;
+    }
+
+    .statCard {
+        background-color: lightgreen;
+        flex: 1;
+        min-width: 250px;
+        padding: 30px;
+        border-radius: 30px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        text-align: center;
+        border-top: 6px solid black;
+        transition: transform 0.2s ease;
+    }
+
+    .statCard:hover {
+        transform: translateY(-10px);
+    }
+
+    .cardTitle {
+        font-size: 1rem;
+        font-weight: bold;
+        color: darkslategrey;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 10px;
+
+
+    }
+
+    .cardValue {
+        font-size: 1.0rem;
+        font-weight: 900;
+        color: black;
+        margin: 0;
+    }
