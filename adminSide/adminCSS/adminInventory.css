@@ -109,3 +109,77 @@
         padding: 15px;
         border-bottom: 1px solid lightgray;
     }
+
+    /*No external file for now. adminUsers will use this file for convenience*/
+     #adminModal .adminModal{
+        border: none !important;
+        border-radius: 15px !important;
+        padding:0;
+        width: 350px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 2);
+        margin: auto;
+        overflow: hidden;
+     }
+
+     #adminModal::backdrop {
+        background-color: rgba(0, 0, 0, 0.6);
+        backdrop-filter: blur(4px);
+     }
+
+     .modalHeader {
+        background-color: #000;
+        color: white;
+        padding: 30px 20px;
+        display: flex;
+        justify-content: center;
+        position: relative;
+
+     }
+
+     .modalContent{
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+
+     }
+
+     .closeButton {
+        position: absolute;
+        top: 10px;
+        right: 15px;
+        background: none;
+        border: none;
+        font-size: 24px;
+        cursor: pointer;
+        color: white;
+        font-size: 24px;
+        line-height: 1;
+     }
+
+     .closeButton :hover{
+        color:red;
+     }
+
+     .modalFooter {
+        padding: 20px;
+        text-align: center;
+
+     }
+
+     .modalFooter button {
+        background-color: #000;
+        color: white;
+        padding: 10px 25px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+     }
+
+     .logoutButton {
+        background-color: #d9534F;
+        color: white;
+        padding: 10px 20px;
+        text-decoration: none;
+        border-radius: 5px;
+     }

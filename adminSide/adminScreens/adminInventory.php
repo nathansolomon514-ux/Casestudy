@@ -1,7 +1,7 @@
 <?php
-    include "sessionCheck.php";
-    include "../Front-End/connection.php";
-    include "functions.php";
+    include "../phpActionScripts/sessionCheck.php";
+    include "../../Front-End/connection.php";
+    include_once "../phpActionScripts/functions.php";
 
     $search = $_GET["searchBar"] ?? "";
     $result = searchInventory($con, $search);
@@ -13,14 +13,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="adminInventory.css">
+    <link rel="stylesheet" href="../adminCSS/adminInventory.css">
     <title>Admin Dashboard</title>
     
 </head>
 <body>
     <!--Logo Header-->
     <div class="header">
-        <img src="../Resources/Images/Logo.png" class="logo-black"alt="Black Logo">
+        <img src="../../Resources/Images/Logo.png" class="logo-black"alt="Black Logo">
     </div>
     <!--Navigation Header-->
         <div class="navHeader">
@@ -28,13 +28,13 @@
         <a class="active" href="adminDashboard.php">Dashboard</a>
         <a href="adminInventory.php">Inventory</a>
         <a href="">User Menu</a>
-        <a href="">Admin Menu</a>
+        <a href="adminUsers.php">Admin Menu</a>
         <a href="">Orders</a>
-        <a href="">Admin Account</a>
+        <a href="adminAccount.php">Admin Account</a>
     </nav>
         
         </div>
-   <h3 class="welcomeAdmin">Welcome Admin, <?php echo "Admin123"//$placeholderUser?></h3>
+   <h3 class="welcomeAdmin">Welcome Admin, <?php echo htmlspecialchars($_SESSION['adminName']); ?></h3>
 
 
 <main class="dashboardContent">
