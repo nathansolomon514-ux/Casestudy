@@ -2,23 +2,33 @@
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type");
-require_once 'connection.php';
-
+require_once 'connection.php'; /
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // These names must match the 'name' attribute in your HTML inputs
     $first_name = $_POST['first_name'];
-    $last_name = $_POST['last_name'];
-    $email = $_POST['email'];
-    $hashed_password = password_hash($_POST['password'], PASSWORD_DEFAULT);
+    $last_name  = $_POST['last_name'];
+    $email      = $_POST['email'];
+    $password   = $_POST['password'];
+    $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
-   try {
-    $stmt = $pdo->prepare("INSERT INTO users (email, password_hash, first_name, last_name) VALUES (?, ?, ?, ?)");
-    $stmt->execute([$email, $hashed_password, $first_name, $last_name]);
-    echo "success"; // AJAX looks for this exact word
-    exit();
-} catch (PDOException $e) {
-    echo "Error: " . $e->getMessage();
-    exit();
-}
+    try {
+        $stmt = $mysqli->prepare("INSERT INTO users (email, password_hash, first_name, last_name) VALUES (?, ?, ?, ?)");
+        
+        $stmt->bind_param("ssss", $email, $hashed_password, $first_name, $last_name);
+        
+
+        if ($stmt->execute()) {
+            echo "success"; 
+        } else {
+            echo "Error: Could not execute query.";
+        }
+        
+        $stmt->close();
+        exit();
+
+    } catch (mysqli_sql_exception $e) {
+
+        echo "Error: " . $e->getMessage();
+        exit();
+    }
 }
 ?>
