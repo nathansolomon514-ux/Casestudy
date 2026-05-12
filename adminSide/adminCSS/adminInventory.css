@@ -95,14 +95,16 @@
         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
         border-top: 5px solid black;
         margin: 0 auto;
+        flex-shrink: 0;
+    min-width: fit-content;
     }
 
 
     .inventoryTable {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 10px;
-    }
+    font-size: 14px !important; 
+    width: 100% !important;
+    table-layout: auto;
+}
 
     .inventoryTable th, .inventoryTable td{
         text-align: center;
@@ -110,18 +112,29 @@
         border-bottom: 1px solid lightgray;
     }
 
+    .inventoryTable tbody tr {
+    display: table-row !important;
+}
+
+.inventoryTable td {
+    font-size: 16px; 
+    white-space: nowrap; 
+}
+
     /*No external file for now. adminUsers will use this file for convenience*/
-     #adminModal .adminModal{
+     #adminModal, .adminModal{
         border: none !important;
         border-radius: 15px !important;
         padding:0;
         width: 350px;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 2);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
         margin: auto;
         overflow: hidden;
+        background-color: white;
      }
 
-     #adminModal::backdrop {
+
+     #adminModal::backdrop, .adminModal::backdrop {
         background-color: rgba(0, 0, 0, 0.6);
         backdrop-filter: blur(4px);
      }
@@ -129,10 +142,15 @@
      .modalHeader {
         background-color: #000;
         color: white;
+        width: 100%;
         padding: 30px 20px;
         display: flex;
         justify-content: center;
         position: relative;
+        box-sizing: border-box;
+        margin-left: auto;
+        margin-right: auto;
+        box-sizing: border-box;
 
      }
 
@@ -140,7 +158,18 @@
         padding: 20px;
         display: flex;
         flex-direction: column;
+        width: 100%;
         gap: 10px;
+        box-sizing: border-box;
+     }
+
+     .modalContent input{
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        gap: 10px;
+        box-sizing: border-box;
 
      }
 
@@ -152,18 +181,27 @@
         border: none;
         font-size: 24px;
         cursor: pointer;
-        color: white;
+        color: white !important;
         font-size: 24px;
         line-height: 1;
+        display: flex;
      }
 
-     .closeButton :hover{
-        color:red;
+     .closeButton:visited
+     .closeButton:active
+     .closeButton:link{
+        color: white !important;
+        text-decoration: none;
+     }
+
+     .closeButton:hover{
+        color:#ff4d4d !important;
      }
 
      .modalFooter {
         padding: 20px;
         text-align: center;
+        width: 100%;
 
      }
 
@@ -182,4 +220,41 @@
         padding: 10px 20px;
         text-decoration: none;
         border-radius: 5px;
+     }
+
+     .modalWrapper {
+        padding: 20px; 
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-width: 400px;
+     }
+
+     .pagination {
+        margin-top: 20px;
+        text-align: center;
+
+     }
+
+     .prevNext {
+        padding: 8px 16px;
+        background-color: #333;
+        color: white;
+        text-decoration: none;
+        border-radius: 4px;
+        margin: 0 10px;
+
+     }
+
+     .prevNext:hover{
+        background-color: #555;
+     }
+
+     .deleteButton {
+        background-color: #dc3534;
+         color: white; 
+         border: none; 
+         padding: 5px 10px;
+          cursor: pointer; 
+          border-radius: 4px;
      }

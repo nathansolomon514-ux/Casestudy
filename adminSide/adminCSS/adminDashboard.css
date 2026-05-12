@@ -105,10 +105,14 @@
         text-align: center;
         border-top: 6px solid black;
         transition: transform 0.2s ease;
+        cursor: pointer;
+        transition: transform 0.2s, background-color 0.2s;
     }
 
     .statCard:hover {
         transform: translateY(-10px);
+        transform: translateY(-5px); /* That hover you liked */
+        background-color: #90ee90; /* A slightly different green */
     }
 
     .cardTitle {

@@ -1,13 +1,21 @@
 <?php
 include_once "functions.php";
 include_once "../../Front-End/connection.php";
-    if(isset($_POST['createAdmin'])) {
-        $adminName = $_POST['adminName'];
+    if($_SERVER['REQUEST_METHOD'] == "POST" && isset($_POST['createAdmin'])) {
+        $adminFirstName = $_POST['adminFirstName'];
+        $adminLastName = $_POST['adminLastName'];
+        $adminEmail = $_POST['adminEmail'];
         $adminPassword = $_POST['adminPassword'];
-        $hashAdminPassword = passwordHashing($adminPassword);
-        if (addAdmin($con, $adminName, $hashAdminPassword))
+
+        if (!filter_var($adminEmail, FILTER_VALIDATE_EMAIL)) {
+            echo "<script>alert('Error: Invalid Email Format. Try again.'); window.history.back();</script>";
+        }
+
+        if (addAdmin($con, $adminFirstName, $adminLastName, $adminEmail, $adminPassword))
             {
-                header("Location: ../adminScreens/adminUsers.php?status=success");
+                $page = $_POST['returnPage'] ?? 1;
+                $search = $_POST['returnSearch'] ?? '';
+                header("Location: ../adminScreens/adminUsers.php?statusFlag=success&page=$page&searchBar=" . urlencode($search));
                 exit();
             } else {
                 echo "<script>alert('Error: Failed to add Admin'); </script>";

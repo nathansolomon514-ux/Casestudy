@@ -1,6 +1,9 @@
 <?php
-    include "../phpActionScripts/sessionCheck.php";
-    include "../../Front-End/connection.php";
+    include_once "../phpActionScripts/sessionCheck.php";
+    include_once "../../Front-End/connection.php";
+    include_once "../phpActionScripts/functions.php"; 
+    include_once "../phpActionScripts/dashboardCounter.php";
+    
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -21,9 +24,9 @@
     <nav>
         <a class="active" href="adminDashboard.php">Dashboard</a>
         <a href="adminInventory.php">Inventory</a>
-        <a href="">User Menu</a>
+        <a href="customerProfiles.php">User Menu</a>
         <a href="adminUsers.php">Admin Menu</a>
-        <a href="">Orders</a>
+        <a href="adminOrders.php">Orders</a>
         <a href="adminAccount.php">Admin Account</a>
     </nav>
         
@@ -32,39 +35,51 @@
 
 
 <main class="dashboardContent">
+    <div class="dashboardStatistics">
+        <a href="adminInventory.php" style="text-decoration: none;">
+            <div class="statCard"> 
+                <div class="cardTitle">Products in Stock</div>
+                <div class="cardValue"><?php echo $countProducts; ?></div>
+            </div>
+        </a>
 
-    <div class="dashboardStatistics" >
-        <div class="statCard"> 
-            <div class="cardTitle">Product in Stock</div>
-            <div class="cardValue">Placeholder: 10</div>
-        </div>
-
+        <a href="customerProfiles.php" style="text-decoration: none;">
         <div class="statCard">
             <div class="cardTitle">User Accounts</div>
-            <div class="cardValue">Placeholder: 10</div>
+            <div class="cardValue"><?php echo $countUsers; ?></div>
         </div>
+        </a>
 
+        <a href="adminUsers.php" style="text-decoration: none;">
         <div class="statCard">
             <div class="cardTitle">Admin Accounts</div>
-            <div class="cardValue">Placeholder: 10</div>
+            <div class="cardValue"><?php echo $countAdmins; ?></div>
         </div>
+         </a>
 
+        <a href="adminOrders.php" style="text-decoration: none;">
         <div class="statCard">
             <div class="cardTitle">Total Orders</div>
-            <div class="cardValue">Placeholder: 10</div>
+            <div class="cardValue"><?php echo $countOrders; ?></div>
         </div>
+        </a>
 
+        <a href="adminOrders.php" style="text-decoration: none;">
         <div class="statCard">
             <div class="cardTitle">Orders Pending</div>
-            <div class="cardValue">Placeholder: 10</div>
+            <div class="cardValue"><?php echo $pendingOrders; ?></div>
         </div>
+            </a>
 
-        <div class="statCard">
-            <div class="cardTitle">Test</div>
-            <div class="cardValue">Placeholder: 10</div>
-        </div>
+        <a href="adminOrders.php" style="text-decoration: none;">
+             <div class="statCard">
+                <div class="cardTitle">Top Courier</div>
+                <div class="cardValue">
+                    <?php echo $popularCourier ? htmlSpecialCharss($popularCourier['full_name']) : "No Deliveries"; ?>
+                </div>
+    </div>
+</a>
     </div> 
-
 </main>
 </body>
 </html>

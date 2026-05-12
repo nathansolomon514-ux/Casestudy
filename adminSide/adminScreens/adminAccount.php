@@ -25,9 +25,9 @@
     <nav>
         <a class="active" href="adminDashboard.php">Dashboard</a>
         <a href="adminInventory.php">Inventory</a>
-        <a href="">User Menu</a>
+        <a href="customerProfiles.php">User Menu</a>
         <a href="adminUsers.php">Admin Menu</a>
-        <a href="">Orders</a>
+        <a href="adminOrders.php">Orders</a>
         <a href="adminAccount.php">Admin Account</a>
     </nav>
         
