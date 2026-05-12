@@ -7,9 +7,9 @@ $pass = '';
 mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 
 try {
-    $mysqli = new mysqli($host, $user, $pass, $db);
+    $con = mysqli_connect($host, $user, $pass, $db);
 
-    $mysqli->set_charset("utf8mb4");
+    mysqli_set_charset($con, "utf8mb4");
 
 } catch (mysqli_sql_exception $e) {
 
