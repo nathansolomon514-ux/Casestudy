@@ -12,7 +12,7 @@
 
     $search = $_GET["searchBar"] ?? "";
 
-    $limit = 5; //rows to return
+    $limit = 10; //rows to return
 
     //rows to show next page
     $page = isset($_GET['page']) ? $_GET['page'] : 1;
@@ -68,12 +68,14 @@
             <table class="inventoryTable">
                 <thead>
                     <tr>
+                         <th>Image</th>
                          <th>Product ID</th>
                          <th>Product</th>
                          <th>Category</th>
                          <th>Variant</th>
                          <th>Stock</th>
                          <th>Price</th>
+                         <th>Description</th>
                          <th>Action</th>
                     </tr>
                 </thead>
@@ -81,6 +83,14 @@
                     <?php if (mysqli_num_rows($result) > 0): ?>
                         <?php while ($row = mysqli_fetch_assoc($result)): ?>
                         <tr>
+                            <td style="text-align: center;">
+            <?php if (!empty($row['variant_image'])): ?>
+                <img src="../../Resources/Images/<?php echo htmlspecialchars($row['variant_image']); ?>" 
+                     style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;">
+            <?php else: ?>
+                <span style="color: #ccc; font-size: 12px;">No Image</span>
+            <?php endif; ?>
+        </td>
                             <td><strong><?php echo htmlSpecialCharss($row['productId']); ?></strong></td>
                             <td><strong><?php echo htmlSpecialCharss($row['productName']); ?></strong></td>
                             <td><?php echo htmlSpecialCharss($row['categoryName']); ?></td>
@@ -108,15 +118,10 @@
 
                             <td>
                                 <?php if(!$isArchived): ?>
-                                    <!--<form action="../phpActionScripts/editProduct.php" method="post" style="display: flex; gap: 5px;">
-                                        <input type="hidden" name="variantID" value="<?php echo $row['variantId']; ?>">
-                                        <input type="number" name="newPrice" value="<?php echo $row['price'];?>" min="0" style="width: 60px;">
-                                        <button type="submit" name="updatePrice" style="background:#28a745; color:white; border:none; cursor:pointer;">SAVE</button>
-                                    </form>--> 
                                     <form action="../phpActionScripts/editProduct.php" method="post" style="display: flex; gap: 5px;">
                                         <input type="hidden" name="variantID" value="<?php echo $row['variantId']; ?>">
                                         <input type="hidden" name="returnPage" value="<?php echo $page; ?>">
-                                        <input type="hidden" name="returnSearch" value="<?php echo htmlspecialchars($search); ?>">
+                                        <input type="hidden" name="returnSearch" value="<?php echo htmlSpecialCharss($search); ?>">
                                         <input type="hidden" name="returnStatus" value="<?php echo $statusView; ?>">
     
                                         <input type="number" name="newPrice" value="<?php echo $row['price'];?>" min="0" style="width: 60px;">
@@ -124,6 +129,16 @@
                                     </form>
                                 <?php else: echo $row['price']; endif; ?>
                             </td>
+
+<td>
+    
+    
+    <button type="button" 
+        class="viewDescBtn" 
+        data-desc="<?php echo htmlspecialchars($row['product_description'] ?? 'No description'); ?>">
+    View
+</button>
+</td>
 
                             <td> <!--fix later-->
                                 <div class="actionContainer">
@@ -147,7 +162,7 @@
                         </tr>
                         <?php endwhile; ?>
                     <?php else: ?>
-                        <tr><td colspan="7" style="text-align:center;">No products found.</td></tr>
+                        <tr><td colspan="9" style="text-align:center;">No products found.</td></tr>
                     <?php endif; ?>
                 </tbody>
             </table>
@@ -171,7 +186,7 @@
         <button type="button" onclick="document.getElementById('addProductModal').close()" class="closeButton" style="background: none; border: none; color: #fff; font-size: 1.5rem; cursor: pointer;">&times;</button>
     </div>
     
-    <form action="../phpActionScripts/addProduct.php" method="post">
+    <form action="../phpActionScripts/addProduct.php" method="post" enctype="multipart/form-data">
         <div class="modalContent" style="padding: 20px; display: flex; flex-direction: column; gap: 12px; box-sizing: border-box;">
             <input type="hidden" name="returnPage" value="<?php echo $page; ?>">
             <input type="hidden" name="returnSearch" value="<?php echo htmlSpecialCharss($search); ?>">
@@ -213,24 +228,24 @@
     </div>
 </div>
 
-            <div style="display: flex; gap: 10px;">
-                <div style="flex: 1;">
-                    <label style="font-weight: bold; font-size: 14px;">Size</label>
-                    <select name="sizeID" required style="padding: 10px; width: 100%; border-radius: 4px; border: 1px solid #ccc;">
-                        <?php while($sRow = mysqli_fetch_assoc($allSizes)): ?>
-                            <option value="<?php echo $sRow['size_id']; ?>"><?php echo htmlspecialchars($sRow['size_name']); ?></option>
-                        <?php endwhile; ?>
-                    </select>
-                </div>
-                <div style="flex: 1;">
-                    <label style="font-weight: bold; font-size: 14px;">Color</label>
-                    <select name="colorID" required style="padding: 10px; width: 100%; border-radius: 4px; border: 1px solid #ccc;">
-                        <?php while($cRow = mysqli_fetch_assoc($allColors)): ?>
-                            <option value="<?php echo $cRow['color_id']; ?>"><?php echo htmlspecialchars($cRow['color_name']); ?></option>
-                        <?php endwhile; ?>
-                    </select>
-                </div>
-            </div>
+<div style="display: flex; gap: 10px;">
+    <div style="flex: 1;">
+        <label style="font-weight: bold; font-size: 14px;">Size</label>
+        <input type="text" name="sizeName" required placeholder="e.g. XL" style="padding: 10px; width: 100%; box-sizing: border-box; border-radius: 4px; border: 1px solid #ccc;">
+    </div>
+    <div style="flex: 1;">
+        <label style="font-weight: bold; font-size: 14px;">Color</label>
+        <input type="text" name="colorName" required placeholder="e.g. Acid Green" style="padding: 10px; width: 100%; box-sizing: border-box; border-radius: 4px; border: 1px solid #ccc;">
+    </div>
+</div>
+
+<div style="flex: 1;">
+    <label style="font-weight: bold; font-size: 14px;">Product Image</label>
+    <input type="file" name="productImage" accept="image/*" style="width: 100%; margin-top: 5px; padding: 10px; border-radius: 4px; border: 1px solid #ccc;">
+</div>
+
+<div style="display: flex; gap: 10px;">
+    </div>
 
             <div style="display: flex; gap: 10px;">
                 <div style="flex: 1;">
@@ -251,6 +266,16 @@
         </div>
     </form>
 </dialog>
+            <!--Description Modal-->
+<dialog id="descriptionModal" style="width: 300px; border-radius: 8px; border: none; box-shadow: 0 4px 20px rgba(0,0,0,0.3);">
+    <div style="background: #000; color: #fff; padding: 10px 15px; display: flex; justify-content: space-between; align-items: center;">
+        <h2 style="margin: 0; font-size: 1.1rem;">Description</h2>
+        <button type="button" onclick="document.getElementById('descriptionModal').close()" style="background: none; border: none; color: #fff; cursor: pointer;">&times;</button>
+    </div>
+    <div style="padding: 15px;">
+        <p id="descriptionText" style="margin: 0; color: #333;"></p>
+    </div>
+</dialog>
 
 <script>
 function toggleProductMode() {
@@ -264,7 +289,6 @@ function toggleProductMode() {
         newGroup.style.display = 'none';
         document.getElementsByName('newProductName')[0].required = false;
         
-        // Clear value when hidden to prevent cross-contamination
         descriptionField.value = ''; 
     } else {
         existingGroup.style.display = 'none';
@@ -272,6 +296,19 @@ function toggleProductMode() {
         document.getElementsByName('newProductName')[0].required = true;
     }
 }
+
+console.log("Script is loading...");
+
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.viewDescBtn').forEach(button => {
+        button.addEventListener('click', (e) => {
+            const desc = e.currentTarget.getAttribute('data-desc');
+            const modal = document.getElementById('descriptionModal');
+            document.getElementById('descriptionText').innerText = desc;
+            modal.showModal();
+        });
+    });
+});
 </script>
 </body>
 </html>

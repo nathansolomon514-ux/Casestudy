@@ -7,17 +7,18 @@
 
 
     $statusFilter = $_GET['status'] ?? 'All';
+    $paymentFilter = $_GET['payment_method'] ?? 'All';
     //$isArchived = ($statusView === 'archivedUsers');
 
     $orderSearch = $_GET["searchBar"] ?? "";
     //$result = customerQuery($con, $adminSearch);
-    $limit = 5; //rows to return
+    $limit = 10; //rows to return
     //rows to show next page
     $page = isset($_GET['page']) ? /*(int)*/$_GET['page'] : 1;
     if ($page < 1) $page = 1;
     $offset = ($page - 1) * $limit;
 
-    $result = getOrders($con, $limit, $offset, $orderSearch, $statusFilter);
+    $result = getOrders($con, $limit, $offset, $orderSearch, $statusFilter, $paymentFilter);
 ?>
     
 
@@ -70,6 +71,15 @@
         
         </select>
 
+        <label>Payment Method</label>
+            <select name="payment_method" onchange="this.form.submit()">
+            <option value="All">All Methods</option>
+            <option value="GCash" <?php echo ($_GET['payment_method'] ?? '') == 'GCash' ? 'selected' : ''; ?>>GCash</option>
+            <option value="Maya" <?php echo ($_GET['payment_method'] ?? '') == 'Maya' ? 'selected' : ''; ?>>Maya</option>
+            <option value="COD" <?php echo ($_GET['payment_method'] ?? '') == 'COD' ? 'selected' : ''; ?>>COD</option>
+            
+        </select>
+
         </form>
 
     <div class="inventoryContainer">
@@ -81,6 +91,8 @@
                  <th>Date</th>
                  <th>Customer</th>
                  <th>Total Amount</th>
+                 <th>Payment Method</th>
+                 <th>Payment Status</th>
                  <th>Courier Name</th>
                  <th>Destination</th>
                  <th>Status</th>
@@ -101,6 +113,9 @@
                         <td> <?php echo date('M d, Y', strtotime($row['created_at'])); ?>                        </td>
                         <td> <?php echo htmlSpecialCharss($fullName); ?>                                          </td>
                         <td> <?php echo number_format($row['total_amount'], 2); ?>                               </td>
+                        <td> <?php echo htmlSpecialCharss($row['payment_method'] ?? 'N/A'); ?> </td>
+                        <td> <?php echo htmlSpecialCharss($row['payment_status_name'] ?? 'N/A'); ?> </td>
+                        <td> <?php echo htmlSpecialCharss($row['courier_name'] ?? 'not selected'); ?> </td>
                         <td> <?php echo htmlSpecialCharss($row['courier_name'] ?? 'not selected') ;?>            </td>
                         <td> <?php echo htmlSpecialCharss($row['shipping_address'] ?? 'no address provided') ;?> </td>
                         <td>
