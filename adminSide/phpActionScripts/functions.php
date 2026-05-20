@@ -329,35 +329,136 @@
                 return mysqli_stmt_execute($stmt);
             }
 
-           function addProductVariant($con, $name, $description, $basePrice, $catID, $tierID, $sizeID, $colorID, $sku, $stock, $priceOverride) {
-    // 1. Check if the product already exists
-                $checkQuery = "SELECT product_id FROM products WHERE product_name = ?";
-                $stmtCheck = mysqli_prepare($con, $checkQuery);
-                mysqli_stmt_bind_param($stmtCheck, "s", $name);
-                mysqli_stmt_execute($stmtCheck);
-                $resCheck = mysqli_stmt_get_result($stmtCheck);
-
-                if ($row = mysqli_fetch_assoc($resCheck)) {
-                    $productID = $row['product_id'];
+           function addProductVariant($con, $entryType, $existingProductID, $name, $description, $basePrice, $catID, $tierID, $sizeID, $colorID, $sku, $stock, $priceOverride) {
+                // Determine product context based on modal layout selections
+                if ($entryType === 'existing') {
+                    $productID = $existingProductID;
                 } else {
-        // 2. Insert new product using your columns: name, description, base_price, category_id, tier_id
-                $insertProdQuery = "INSERT INTO products (product_name, product_description, base_price, category_id, tier_id, is_active) 
-                                    VALUES (?, ?, ?, ?, ?, 1)";
-                 $stmtProd = mysqli_prepare($con, $insertProdQuery);
-                mysqli_stmt_bind_param($stmtProd, "ssdii", $name, $description, $basePrice, $catID, $tierID);
-                mysqli_stmt_execute($stmtProd);
-                $productID = mysqli_insert_id($con);
+                    // Check if a catalog item with this exact name already exists to avoid structural corruption
+                    $checkQuery = "SELECT product_id FROM products WHERE product_name = ?";
+                    $stmtCheck = mysqli_prepare($con, $checkQuery);
+                    mysqli_stmt_bind_param($stmtCheck, "s", $name);
+                    mysqli_stmt_execute($stmtCheck);
+                    $resCheck = mysqli_stmt_get_result($stmtCheck);
+
+                    if ($row = mysqli_fetch_assoc($resCheck)) {
+                        $productID = $row['product_id'];
+                    } else {
+                        // Insert new master line product entry properties
+                        $insertProdQuery = "INSERT INTO products (product_name, product_description, base_price, category_id, tier_id, is_active) 
+                                            VALUES (?, ?, ?, ?, ?, 1)";
+                        $stmtProd = mysqli_prepare($con, $insertProdQuery);
+                        mysqli_stmt_bind_param($stmtProd, "ssdii", $name, $description, $basePrice, $catID, $tierID);
+                        mysqli_stmt_execute($stmtProd);
+                        $productID = mysqli_insert_id($con);
+                    }
                 }
 
-    // 3. Insert the variant using your columns: product_id, size_id, color_id, sku, stock_quantity, price_override
+                // Append the specialized variance settings instance to product_variants table
                 $insertVarQuery = "INSERT INTO product_variants (product_id, size_id, color_id, sku, stock_quantity, price_override, is_active) 
                                    VALUES (?, ?, ?, ?, ?, ?, 1)";
                 $stmtVar = mysqli_prepare($con, $insertVarQuery);
-    
-    // Bind parameters: i = int, s = string, d = double/decimal
                 mysqli_stmt_bind_param($stmtVar, "iiisid", $productID, $sizeID, $colorID, $sku, $stock, $priceOverride);
-    
+                
                 return mysqli_stmt_execute($stmtVar);
+            }
+
+            function getDailyRevenue($con) {
+                $query = "SELECT SUM(oi.quantity * oi.price_at_purchase) AS total 
+                          FROM order_items oi 
+                          JOIN orders o ON oi.order_id = o.order_id 
+                          WHERE DATE(o.created_at) = CURDATE() 
+                          AND o.order_status_id = 4";
+                $stmt = mysqli_prepare($con, $query);
+                mysqli_stmt_execute($stmt);
+                $result = mysqli_stmt_get_result($stmt);
+                $row = mysqli_fetch_assoc($result);
+                return $row['total'] ?? 0.00;
+            }
+
+            function getWeeklyRevenue($con) {
+                $query = "SELECT SUM(oi.quantity * oi.price_at_purchase) AS total 
+                          FROM order_items oi 
+                          JOIN orders o ON oi.order_id = o.order_id 
+                          WHERE o.created_at >= DATE_SUB(CURDATE(), INTERVAL 7 DAY) 
+                          AND o.order_status_id = 4";
+                $stmt = mysqli_prepare($con, $query);
+                mysqli_stmt_execute($stmt);
+                $result = mysqli_stmt_get_result($stmt);
+                $row = mysqli_fetch_assoc($result);
+                return $row['total'] ?? 0.00;
+            }
+
+            function getMonthlyRevenue($con) {
+                $query = "SELECT SUM(oi.quantity * oi.price_at_purchase) AS total 
+                          FROM order_items oi 
+                          JOIN orders o ON oi.order_id = o.order_id 
+                          WHERE o.created_at >= DATE_SUB(CURDATE(), INTERVAL 30 DAY) 
+                          AND o.order_status_id = 4";
+                $stmt = mysqli_prepare($con, $query);
+                mysqli_stmt_execute($stmt);
+                $result = mysqli_stmt_get_result($stmt);
+                $row = mysqli_fetch_assoc($result);
+                return $row['total'] ?? 0.00;
+            }
+
+            function getMostPopularProduct($con) {
+                $query = "SELECT pv.variant_id, 
+                            CONCAT('[', cat.category_name, '] ', p.product_name, ' - ', c.color_name, ' (', s.size_name, ')') AS variant_full_name,
+                            COUNT(oi.order_id) AS order_count
+                            FROM order_items oi
+                            JOIN product_variants pv ON oi.variant_id = pv.variant_id
+                            JOIN products p ON pv.product_id = p.product_id
+                            JOIN categories cat ON p.category_id = cat.category_id
+                            JOIN colors c ON pv.color_id = c.color_id
+                            JOIN sizes s ON pv.size_id = s.size_id
+                            GROUP BY pv.variant_id, p.product_name, cat.category_name, c.color_name, s.size_name
+                            ORDER BY order_count DESC
+                            LIMIT 1";
+                $stmt = mysqli_prepare($con, $query);
+                mysqli_stmt_execute($stmt);
+                $result = mysqli_stmt_get_result($stmt);
+                return mysqli_fetch_assoc($result) ?: null;
+            }
+
+            function getLeastPopularProduct($con) {
+                $query = "SELECT pv.variant_id, 
+                            CONCAT('[', cat.category_name, '] ', p.product_name, ' - ', c.color_name, ' (', s.size_name, ')') AS variant_full_name,
+                            COUNT(oi.order_id) AS order_count
+                            FROM order_items oi
+                            JOIN product_variants pv ON oi.variant_id = pv.variant_id
+                            JOIN products p ON pv.product_id = p.product_id
+                            JOIN categories cat ON p.category_id = cat.category_id
+                            JOIN colors c ON pv.color_id = c.color_id
+                            JOIN sizes s ON pv.size_id = s.size_id
+                            GROUP BY pv.variant_id, p.product_name, cat.category_name, c.color_name, s.size_name
+                            ORDER BY order_count ASC
+                            LIMIT 1";
+                $stmt = mysqli_prepare($con, $query);
+                mysqli_stmt_execute($stmt);
+                $result = mysqli_stmt_get_result($stmt);
+                return mysqli_fetch_assoc($result) ?: null;
+            }
+
+
+            function getAllActiveProducts($con) {
+    $query = "SELECT product_id, product_name FROM products WHERE is_active = 1 ORDER BY product_name ASC";
+    return mysqli_query($con, $query);
+}
+
+function getAllCategories($con) {
+    $query = "SELECT category_id, category_name FROM categories ORDER BY category_name ASC";
+    return mysqli_query($con, $query);
+}
+
+function getAllColors($con) {
+    $query = "SELECT color_id, color_name FROM colors ORDER BY color_name ASC";
+    return mysqli_query($con, $query);
+}
+
+function getAllSizes($con) {
+    $query = "SELECT size_id, size_name FROM sizes ORDER BY size_id ASC";
+    return mysqli_query($con, $query);
 }
             
         /*Add all functions here so it can be used by other webpages*/

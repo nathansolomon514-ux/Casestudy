@@ -78,7 +78,55 @@
                     <?php echo $popularCourier ? htmlSpecialCharss($popularCourier['full_name']) : "No Deliveries"; ?>
                 </div>
     </div>
+        </a>
+
+        <a href="adminOrders.php" style="text-decoration: none;">
+            <div class="statCard">
+                <div class="cardTitle">Daily Revenue</div>
+                <div class="cardValue">₱<?php echo number_format($dailyRevenue, 2); ?></div>
+            </div>
+        </a>
+
+        <a href="adminOrders.php" style="text-decoration: none;">
+            <div class="statCard">
+                <div class="cardTitle">Weekly Revenue</div>
+                <div class="cardValue">₱<?php echo number_format($weeklyRevenue, 2); ?></div>
+            </div>
+        </a>
+
+        <a href="adminOrders.php" style="text-decoration: none;">
+            <div class="statCard">
+                <div class="cardTitle">Monthly Revenue</div>
+                <div class="cardValue">₱<?php echo number_format($monthlyRevenue, 2); ?></div>
+            </div>
+        </a>
+
+        <a href="adminInventory.php" style="text-decoration: none;">
+    <div class="statCard">
+        <div class="cardTitle">Top Selling Variant</div>
+        <div class="cardValue" style="font-size: 0.95rem; line-height: 1.3; padding: 5px 10px; word-break: break-word; max-width: 100%;">
+            <?php echo $popularProduct ? htmlSpecialCharss($popularProduct['variant_full_name']) : "No Sales Yet"; ?>
+        </div>
+        <small style="color: #666; font-size: 0.8rem;">
+            <?php echo $popularProduct ? $popularProduct['order_count'] . " orders" : ""; ?>
+        </small>
+    </div>
 </a>
+
+<a href="adminInventory.php" style="text-decoration: none;">
+    <div class="statCard">
+        <div class="cardTitle">Least Selling Variant</div>
+        <div class="cardValue" style="font-size: 0.95rem; line-height: 1.3; padding: 5px 10px; word-break: break-word; max-width: 100%;">
+            <?php echo $leastProduct ? htmlSpecialCharss($leastProduct['variant_full_name']) : "No Sales Yet"; ?>
+        </div>
+        <small style="color: #666; font-size: 0.8rem;">
+            <?php echo $leastProduct ? $leastProduct['order_count'] . " orders" : ""; ?>
+        </small>
+    </div>
+</a>
+            </div>
+
+
     </div> 
 </main>
 </body>

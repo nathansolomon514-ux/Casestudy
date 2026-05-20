@@ -6,4 +6,10 @@
     $pendingOrders = getTableCount($con, "orders", "WHERE order_status_id = 1");
     $popularCourier = getMostPopularCourier($con);
 
+    $dailyRevenue   = getDailyRevenue($con);
+    $weeklyRevenue  = getWeeklyRevenue($con);
+    $monthlyRevenue = getMonthlyRevenue($con);
+
+    $popularProduct = getMostPopularProduct($con);
+    $leastProduct   = getLeastPopularProduct($con);
 ?>

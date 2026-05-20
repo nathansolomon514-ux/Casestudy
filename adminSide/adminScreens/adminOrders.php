@@ -115,6 +115,7 @@
                                     <option value="2" <?php echo ($row['order_status_id'] == 2) ? 'selected' : ''; ?>>Processing</option>
                                     <option value="3" <?php echo ($row['order_status_id'] == 3) ? 'selected' : ''; ?>>Shipped</option>
                                     <option value="4" <?php echo ($row['order_status_id'] == 4) ? 'selected' : ''; ?>>Delivered</option>
+                                    <option value="5" <?php echo ($row['order_status_id'] == 5) ? 'selected' : ''; ?>>Cancelled</option>
                                 </select>
                             </form>
                         </td>
