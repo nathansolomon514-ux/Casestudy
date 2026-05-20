@@ -5,6 +5,7 @@
     include_once "../phpActionScripts/editProduct.php";
     include_once "../phpActionScripts/archiveProduct.php";
     include_once "../phpActionScripts/restoreProducts.php";
+    include_once "../phpActionScripts/addProductQuery.php";
 
     $statusView = $_GET['status'] ?? 'activeProducts';
     $isArchived = ($statusView === 'archivedProducts');
@@ -19,6 +20,7 @@
 
     $offset = ($page - 1) * $limit;
     $result = searchInventory($con, $limit, $offset, $search, $isArchived);
+
 ?>
     
 
@@ -94,18 +96,31 @@
                                 <?php if(!$isArchived): ?>
                                     <form action="../phpActionScripts/editProduct.php" method="post" style="display: flex; gap: 5px;">
                                         <input type="hidden" name="variantID" value="<?php echo $row['variantId']; ?>">
+                                        <input type="hidden" name="returnPage" value="<?php echo $page; ?>">
+                                        <input type="hidden" name="returnSearch" value="<?php echo htmlspecialchars($search); ?>">
+                                        <input type="hidden" name="returnStatus" value="<?php echo $statusView; ?>">
+    
                                         <input type="number" name="newStock" value="<?php echo $row['stock'];?>" min="0" style="width: 60px;">
-                                        <button type="submit" name="updateStock" style="background:#28a745; color:white; border:none; cursor:pointer;">SAVE</button>
+                                        <button type="submit" name="updateStock" style="background:#28a745; color:white; border:none; padding: 5px 10px; border-radius: 4px; cursor:pointer;">SAVE</button>
                                     </form>
                                 <?php else: echo $row['stock']; endif; ?>
                             </td>
 
                             <td>
                                 <?php if(!$isArchived): ?>
-                                    <form action="../phpActionScripts/editProduct.php" method="post" style="display: flex; gap: 5px;">
+                                    <!--<form action="../phpActionScripts/editProduct.php" method="post" style="display: flex; gap: 5px;">
                                         <input type="hidden" name="variantID" value="<?php echo $row['variantId']; ?>">
                                         <input type="number" name="newPrice" value="<?php echo $row['price'];?>" min="0" style="width: 60px;">
                                         <button type="submit" name="updatePrice" style="background:#28a745; color:white; border:none; cursor:pointer;">SAVE</button>
+                                    </form>--> 
+                                    <form action="../phpActionScripts/editProduct.php" method="post" style="display: flex; gap: 5px;">
+                                        <input type="hidden" name="variantID" value="<?php echo $row['variantId']; ?>">
+                                        <input type="hidden" name="returnPage" value="<?php echo $page; ?>">
+                                        <input type="hidden" name="returnSearch" value="<?php echo htmlspecialchars($search); ?>">
+                                        <input type="hidden" name="returnStatus" value="<?php echo $statusView; ?>">
+    
+                                        <input type="number" name="newPrice" value="<?php echo $row['price'];?>" min="0" style="width: 60px;">
+                                        <button type="submit" name="updatePrice" style="background:#28a745; color:white; border:none; padding: 5px 10px; border-radius: 4px; cursor:pointer;">SAVE</button>
                                     </form>
                                 <?php else: echo $row['price']; endif; ?>
                             </td>
@@ -150,63 +165,113 @@
     </main>
 
     <!--Add Product Modal-->
-    <dialog id="addProductModal" class="adminModal">
-    <div class="modalHeader">
-        <h2>Add New Product Variant</h2>
-        <button type="button" onclick="document.getElementById('addProductModal').close()" class="closeButton">&times;</button>
+    <dialog id="addProductModal" class="adminModal" style="width: 450px; border-radius: 8px; border: none; box-shadow: 0 4px 20px rgba(0,0,0,0.3);">
+    <div class="modalHeader" style="background: #000; color: #fff; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center;">
+        <h2 style="margin: 0; font-size: 1.2rem;">Add Product Variant</h2>
+        <button type="button" onclick="document.getElementById('addProductModal').close()" class="closeButton" style="background: none; border: none; color: #fff; font-size: 1.5rem; cursor: pointer;">&times;</button>
     </div>
     
     <form action="../phpActionScripts/addProduct.php" method="post">
-        <div class="modalContent" style="padding: 20px; display: flex; flex-direction: column; gap: 5px;">
+        <div class="modalContent" style="padding: 20px; display: flex; flex-direction: column; gap: 12px; box-sizing: border-box;">
             <input type="hidden" name="returnPage" value="<?php echo $page; ?>">
-            <input type="hidden" name="returnSearch" value="<?php echo htmlspecialchars($search); ?>">
+            <input type="hidden" name="returnSearch" value="<?php echo htmlSpecialCharss($search); ?>">
             <input type="hidden" name="returnStatus" value="<?php echo $statusView; ?>">
 
-            <label style="font-weight: bold; font-size: 14px;">Product Name</label>
-            <input type="text" name="productName" required placeholder="e.g. Graphic Tee" style="padding: 10px; width: 100%; box-sizing: border-box;">
-
-            <label style="font-weight: bold; font-size: 14px; margin-top: 10px;">Category</label>
-            <select name="categoryID" required style="padding: 10px; width: 100%; box-sizing: border-box;">
-                <option value="1">Apparel</option>
-                <option value="2">Accessories</option>
+            <label style="font-weight: bold; font-size: 14px;">Entry Type</label>
+            <select id="entryType" name="entryType" onchange="toggleProductMode()" style="padding: 10px; width: 100%; border-radius: 4px; border: 1px solid #ccc;">
+                <option value="existing">Add Variant to Existing Catalog Product</option>
+                <option value="new">Create a Brand New Base Product</option>
             </select>
 
-            <div style="display: flex; gap: 10px; margin-top: 10px;">
+            <div id="existingProductGroup">
+                <label style="font-weight: bold; font-size: 14px;">Select Product</label>
+                <select name="productID" style="padding: 10px; width: 100%; border-radius: 4px; border: 1px solid #ccc;">
+                    <?php while($pRow = mysqli_fetch_assoc($allProducts)): ?>
+                        <option value="<?php echo $pRow['product_id']; ?>"><?php echo htmlspecialchars($pRow['product_name']); ?></option>
+                    <?php endwhile; ?>
+                </select>
+            </div>
+
+            <div id="newProductGroup" style="display: none; flex-direction: column; gap: 12px;">
+    <div>
+        <label style="font-weight: bold; font-size: 14px;">New Product Name</label>
+        <input type="text" name="newProductName" placeholder="e.g. Acid Green Tee" style="padding: 10px; width: 100%; box-sizing: border-box; border-radius: 4px; border: 1px solid #ccc;">
+    </div>
+    
+    <div>
+        <label style="font-weight: bold; font-size: 14px;">Product Description</label>
+        <textarea name="newProductDescription" placeholder="e.g. Heavyweight cotton, vintage fit, screen-printed graphic." rows="3" style="padding: 10px; width: 100%; box-sizing: border-box; border-radius: 4px; border: 1px solid #ccc; font-family: inherit; resize: vertical;"></textarea>
+    </div>
+
+    <div>
+        <label style="font-weight: bold; font-size: 14px;">Category</label>
+        <select name="categoryID" style="padding: 10px; width: 100%; border-radius: 4px; border: 1px solid #ccc;">
+            <?php mysqli_data_seek($allCategories, 0); while($catRow = mysqli_fetch_assoc($allCategories)): ?>
+                <option value="<?php echo $catRow['category_id']; ?>"><?php echo htmlspecialchars($catRow['category_name']); ?></option>
+            <?php endwhile; ?>
+        </select>
+    </div>
+</div>
+
+            <div style="display: flex; gap: 10px;">
                 <div style="flex: 1;">
                     <label style="font-weight: bold; font-size: 14px;">Size</label>
-                    <select name="sizeID" required style="padding: 10px; width: 100%; box-sizing: border-box;">
-                        <option value="1">Small</option>
-                        <option value="2">Medium</option>
-                        <option value="3">Large</option>
+                    <select name="sizeID" required style="padding: 10px; width: 100%; border-radius: 4px; border: 1px solid #ccc;">
+                        <?php while($sRow = mysqli_fetch_assoc($allSizes)): ?>
+                            <option value="<?php echo $sRow['size_id']; ?>"><?php echo htmlspecialchars($sRow['size_name']); ?></option>
+                        <?php endwhile; ?>
                     </select>
                 </div>
                 <div style="flex: 1;">
                     <label style="font-weight: bold; font-size: 14px;">Color</label>
-                    <select name="colorID" required style="padding: 10px; width: 100%; box-sizing: border-box;">
-                        <option value="1">Black</option>
-                        <option value="2">White</option>
+                    <select name="colorID" required style="padding: 10px; width: 100%; border-radius: 4px; border: 1px solid #ccc;">
+                        <?php while($cRow = mysqli_fetch_assoc($allColors)): ?>
+                            <option value="<?php echo $cRow['color_id']; ?>"><?php echo htmlspecialchars($cRow['color_name']); ?></option>
+                        <?php endwhile; ?>
                     </select>
                 </div>
             </div>
 
-            <div style="display: flex; gap: 10px; margin-top: 10px;">
+            <div style="display: flex; gap: 10px;">
                 <div style="flex: 1;">
                     <label style="font-weight: bold; font-size: 14px;">Initial Stock</label>
-                    <input type="number" name="stock" value="0" min="0" required style="padding: 10px; width: 100%; box-sizing: border-box;">
+                    <input type="number" name="stock" value="0" min="0" required style="padding: 10px; width: 100%; box-sizing: border-box; border-radius: 4px; border: 1px solid #ccc;">
                 </div>
                 <div style="flex: 1;">
                     <label style="font-weight: bold; font-size: 14px;">Price (₱)</label>
-                    <input type="number" name="price" step="0.01" value="0.00" min="0" required style="padding: 10px; width: 100%; box-sizing: border-box;">
+                    <input type="number" name="price" step="0.01" value="0.00" min="0" required style="padding: 10px; width: 100%; box-sizing: border-box; border-radius: 4px; border: 1px solid #ccc;">
                 </div>
             </div>
         </div>
 
-        <div class="modalFooter" style="padding: 20px;">
-            <button type="submit" name="addProduct" style="background: #28a745; color: white; padding: 10px; border: none; width: 100%; cursor: pointer; border-radius: 5px; font-weight: bold;">
+        <div class="modalFooter" style="padding: 15px 20px;">
+            <button type="submit" name="addProduct" style="background: #28a745; color: white; padding: 12px; border: none; width: 100%; cursor: pointer; border-radius: 5px; font-weight: bold; font-size: 15px;">
                 Confirm Add Product
             </button>
         </div>
     </form>
 </dialog>
+
+<script>
+function toggleProductMode() {
+    const type = document.getElementById('entryType').value;
+    const existingGroup = document.getElementById('existingProductGroup');
+    const newGroup = document.getElementById('newProductGroup');
+    const descriptionField = document.getElementsByName('newProductDescription')[0];
+
+    if (type === 'existing') {
+        existingGroup.style.display = 'block';
+        newGroup.style.display = 'none';
+        document.getElementsByName('newProductName')[0].required = false;
+        
+        // Clear value when hidden to prevent cross-contamination
+        descriptionField.value = ''; 
+    } else {
+        existingGroup.style.display = 'none';
+        newGroup.style.display = 'flex';
+        document.getElementsByName('newProductName')[0].required = true;
+    }
+}
+</script>
 </body>
 </html>
