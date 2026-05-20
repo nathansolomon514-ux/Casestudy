@@ -17,5 +17,4 @@ if ($_SERVER['REQUEST_METHOD'] == "POST" && isset($_POST['order_id']) && isset($
     } else {
         echo "<script>alert('Error: Failed to update order status of customer'); window.location.href='../adminScreens/adminOrders.php'; </script>";
     }
-    exit();
 }

@@ -8,15 +8,25 @@
             return $searchData;
         }
 
+        /* data inputs */
+        function cleanInput($data) {
+    $data = trim($data);
+    $data = filter_var($data, FILTER_SANITIZE_SPECIAL_CHARS);
+    $data = ucwords(strtolower($data));
+    return $data;
+}
+
         function searchInventory($con, $limit, $offset, $search ="", $isArchived = false) {
             $deleteStatus = $isArchived ? 0 : 1;
             $inventoryQuery = "SELECT 
                                 pv.variant_id AS variantId,
                                 p.product_id AS productId,
                                 p.product_name AS productName,
+                                p.product_description,
                                 c.category_name AS categoryName,
                                 pv.stock_quantity AS stock,
                                 COALESCE(pv.price_override, p.base_price) AS price,
+                                pv.variant_image,
                                 cl.color_name AS colorName,
                                 s.size_name AS sizeName
                                 FROM product_variants pv
@@ -37,33 +47,39 @@
             return mysqli_stmt_get_result($stmt);
         }
 
-        function getOrders($con, $limit, $offset, $orderSearch = "", $statusFilter="All") {
-            $matchStatus = ($statusFilter === "All") ? "%" : $statusFilter;
-            $ordersQuery = "SELECT
-                            o.order_id, o.created_at, o.order_status_id ,u.first_name, u.last_name, os.order_status_name,
-                            CONCAT(c.first_name, ' ' , c.last_name) AS courier_name, ds.delivery_status_name, 
-                            loc.user_loc AS shipping_address,
-                            (SELECT SUM(oi.quantity * oi.price_at_purchase)
-                                FROM order_items oi WHERE oi.order_id = o.order_id) AS total_amount
-                                FROM orders o
-                            JOIN users u ON o.user_id = u.user_id
-                            JOIN order_statuses os ON o.order_status_id = os.order_status_id
-                            LEFT JOIN deliveries d ON o.order_id = d.order_id
-                            LEFT JOIN couriers c ON d.courier_id = c.courier_id
-                            LEFT JOIN delivery_statuses ds ON d.delivery_status_id = ds.delivery_status_id
-                            LEFT JOIN user_location loc ON d.location_id = loc.location_id
-                            WHERE (u.first_name LIKE ? OR u.last_name LIKE ? OR o.order_id LIKE?)
-                            AND o.order_status_id LIKE ?
-                            ORDER BY o.created_at DESC, o.order_id DESC
-                            LIMIT ? OFFSET ?";
-            $stmt = mysqli_prepare($con, $ordersQuery);
-            $cleanSearchData = cleanSearch($orderSearch);
-            $searchTerm = "%". $cleanSearchData . "%";
-            mysqli_stmt_bind_param($stmt, 'ssssii', $searchTerm, $searchTerm, $searchTerm, $matchStatus,
-                                  $limit, $offset);
-            mysqli_stmt_execute($stmt);
-            return mysqli_stmt_get_result($stmt);
-        }
+        function getOrders($con, $limit, $offset, $orderSearch = "", $statusFilter="All", $paymentFilter="All") {
+    $matchStatus = ($statusFilter === "All") ? "%" : $statusFilter;
+    $matchPayment = ($paymentFilter === "All") ? "%" : $paymentFilter;
+    $ordersQuery = "SELECT
+                    o.order_id, o.created_at, o.order_status_id, u.first_name, u.last_name, os.order_status_name,
+                    CONCAT(c.first_name, ' ' , c.last_name) AS courier_name, ds.delivery_status_name, 
+                    loc.user_loc AS shipping_address,
+                    p.payment_method, ps.payment_status_name,
+                    (SELECT SUM(oi.quantity * oi.price_at_purchase)
+                        FROM order_items oi WHERE oi.order_id = o.order_id) AS total_amount
+                    FROM orders o
+                    JOIN users u ON o.user_id = u.user_id
+                    JOIN order_statuses os ON o.order_status_id = os.order_status_id
+                    LEFT JOIN deliveries d ON o.order_id = d.order_id
+                    LEFT JOIN couriers c ON d.courier_id = c.courier_id
+                    LEFT JOIN delivery_statuses ds ON d.delivery_status_id = ds.delivery_status_id
+                    LEFT JOIN user_location loc ON d.location_id = loc.location_id
+                    LEFT JOIN payments p ON o.order_id = p.order_id
+                    LEFT JOIN payment_statuses ps ON p.payment_status_id = ps.payment_status_id
+                    WHERE (u.first_name LIKE ? OR u.last_name LIKE ? OR o.order_id LIKE ?)
+                    AND o.order_status_id LIKE ?
+                    AND p.payment_method LIKE ?
+                    ORDER BY o.created_at DESC, o.order_id DESC
+                    LIMIT ? OFFSET ?";
+
+    $stmt = mysqli_prepare($con, $ordersQuery);
+    $cleanSearchData = cleanSearch($orderSearch);
+    $searchTerm = "%". $cleanSearchData . "%";
+    
+    mysqli_stmt_bind_param($stmt, 'sssssii', $searchTerm, $searchTerm, $searchTerm, $matchStatus, $matchPayment, $limit, $offset);
+    mysqli_stmt_execute($stmt);
+    return mysqli_stmt_get_result($stmt);
+}
 
         function getOrderItemsList($con, $orderID) {
             $orderIdQuery = "SELECT oi.quantity,
@@ -291,15 +307,17 @@
 
             
             function getTableCount($con, $table, $condition = "") {
-                // Note: Table names can't be bound in prepared statements, 
-                // but we use the flow for consistency.
-                    $sql = "SELECT COUNT(*) AS total FROM $table $condition";
-                    $stmt = mysqli_prepare($con, $sql);
-                    mysqli_stmt_execute($stmt);
-                    $result = mysqli_stmt_get_result($stmt);
-                    $data = mysqli_fetch_assoc($result);
-                     return $data['total'] ?? 0;
-            }
+    // Only allow specific table names
+    $allowedTables = ['products', 'users', 'orders', 'product_variants'];
+    if (!in_array($table, $allowedTables)) {
+        return 0;
+    }
+    
+    $sql = "SELECT COUNT(*) AS total FROM $table $condition";
+    $result = mysqli_query($con, $sql);
+    $data = mysqli_fetch_assoc($result);
+    return $data['total'] ?? 0;
+}
 
 
                 function getMostPopularCourier($con) {
@@ -329,39 +347,81 @@
                 return mysqli_stmt_execute($stmt);
             }
 
-           function addProductVariant($con, $entryType, $existingProductID, $name, $description, $basePrice, $catID, $tierID, $sizeID, $colorID, $sku, $stock, $priceOverride) {
-                // Determine product context based on modal layout selections
-                if ($entryType === 'existing') {
-                    $productID = $existingProductID;
-                } else {
-                    // Check if a catalog item with this exact name already exists to avoid structural corruption
-                    $checkQuery = "SELECT product_id FROM products WHERE product_name = ?";
-                    $stmtCheck = mysqli_prepare($con, $checkQuery);
-                    mysqli_stmt_bind_param($stmtCheck, "s", $name);
-                    mysqli_stmt_execute($stmtCheck);
-                    $resCheck = mysqli_stmt_get_result($stmtCheck);
+function addProductVariant($con, $entryType, $existingProductID, $name, $description, $basePrice, $catID, $tierID, $sizeName, $colorName, $sku, $stock, $priceOverride, $variantImage) {
+    
+    if ($entryType === 'existing') {
+        $productID = $existingProductID;
+    } else {
+        $insertProdQuery = "INSERT INTO products (product_name, product_description, category_id, tier_id, is_active) VALUES (?, ?, ?, ?, 1)";
+        $stmtProd = mysqli_prepare($con, $insertProdQuery);
+        mysqli_stmt_bind_param($stmtProd, "ssii", $name, $description, $catID, $tierID);
+        
+        if (!mysqli_stmt_execute($stmtProd)) {
+            return false; 
+        }
+        $productID = mysqli_insert_id($con);
+    }
 
-                    if ($row = mysqli_fetch_assoc($resCheck)) {
-                        $productID = $row['product_id'];
-                    } else {
-                        // Insert new master line product entry properties
-                        $insertProdQuery = "INSERT INTO products (product_name, product_description, base_price, category_id, tier_id, is_active) 
-                                            VALUES (?, ?, ?, ?, ?, 1)";
-                        $stmtProd = mysqli_prepare($con, $insertProdQuery);
-                        mysqli_stmt_bind_param($stmtProd, "ssdii", $name, $description, $basePrice, $catID, $tierID);
-                        mysqli_stmt_execute($stmtProd);
-                        $productID = mysqli_insert_id($con);
-                    }
-                }
+    $sizeID = getOrCreateId($con, 'sizes', 'size_name', $sizeName);
+    $colorID = getOrCreateId($con, 'colors', 'color_name', $colorName);
 
-                // Append the specialized variance settings instance to product_variants table
-                $insertVarQuery = "INSERT INTO product_variants (product_id, size_id, color_id, sku, stock_quantity, price_override, is_active) 
-                                   VALUES (?, ?, ?, ?, ?, ?, 1)";
-                $stmtVar = mysqli_prepare($con, $insertVarQuery);
-                mysqli_stmt_bind_param($stmtVar, "iiisid", $productID, $sizeID, $colorID, $sku, $stock, $priceOverride);
-                
-                return mysqli_stmt_execute($stmtVar);
-            }
+$insertVarQuery = "INSERT INTO product_variants 
+                       (product_id, size_id, color_id, sku, stock_quantity, price_override, is_active, variant_image) 
+                       VALUES (?, ?, ?, ?, ?, ?, 1, ?)";
+    
+    $stmtVar = mysqli_prepare($con, $insertVarQuery);
+    mysqli_stmt_bind_param($stmtVar, "iiisids", $productID, $sizeID, $colorID, $sku, $stock, $priceOverride, $variantImage);
+    
+    return mysqli_stmt_execute($stmtVar);
+}
+
+function getOrCreateId($con, $table, $column, $value) {
+    $value = trim($value); 
+    
+    // Check if it exists
+    $query = "SELECT " . str_replace('_name', '_id', $column) . " FROM $table WHERE LOWER($column) = LOWER(?)";
+    $stmt = mysqli_prepare($con, $query);
+    mysqli_stmt_bind_param($stmt, "s", $value);
+    mysqli_stmt_execute($stmt);
+    $res = mysqli_stmt_get_result($stmt);
+    
+    if ($row = mysqli_fetch_array($res)) {
+        return $row[0]; // Return existing ID
+    } else {
+        // Create new entry
+        $insert = "INSERT INTO $table ($column) VALUES (?)";
+        $stmtInsert = mysqli_prepare($con, $insert);
+        mysqli_stmt_bind_param($stmtInsert, "s", $value);
+        mysqli_stmt_execute($stmtInsert);
+        return mysqli_insert_id($con); // Return new ID
+    }
+}
+
+function getOrAddCategory($con, $categoryName) {
+    $categoryName = cleanInput($categoryName);
+
+    // 1. Check if it exists
+    $stmt = mysqli_prepare($con, "SELECT category_id FROM categories WHERE category_name = ?");
+    mysqli_stmt_bind_param($stmt, "s", $categoryName);
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_get_result($stmt);
+
+    if ($row = mysqli_fetch_assoc($result)) {
+        mysqli_stmt_close($stmt);
+        return $row['category_id'];
+    } else {
+        // 2. Insert if it doesn't exist
+        mysqli_stmt_close($stmt); // Close the previous statement
+        $insertStmt = mysqli_prepare($con, "INSERT INTO categories (category_name) VALUES (?)");
+        mysqli_stmt_bind_param($insertStmt, "s", $categoryName);
+        mysqli_stmt_execute($insertStmt);
+        
+        // Get the new ID using the connection link
+        $newId = mysqli_insert_id($con);
+        mysqli_stmt_close($insertStmt);
+        return $newId;
+    }
+}
 
             function getDailyRevenue($con) {
                 $query = "SELECT SUM(oi.quantity * oi.price_at_purchase) AS total 
@@ -441,24 +501,119 @@
             }
 
 
-            function getAllActiveProducts($con) {
+function getAllActiveProducts($con) {
     $query = "SELECT product_id, product_name FROM products WHERE is_active = 1 ORDER BY product_name ASC";
-    return mysqli_query($con, $query);
+    $stmt = mysqli_prepare($con, $query);
+    mysqli_stmt_execute($stmt);
+    return mysqli_stmt_get_result($stmt);
 }
 
 function getAllCategories($con) {
     $query = "SELECT category_id, category_name FROM categories ORDER BY category_name ASC";
-    return mysqli_query($con, $query);
+    $stmt = mysqli_prepare($con, $query);
+    mysqli_stmt_execute($stmt);
+    return mysqli_stmt_get_result($stmt);
 }
 
 function getAllColors($con) {
     $query = "SELECT color_id, color_name FROM colors ORDER BY color_name ASC";
-    return mysqli_query($con, $query);
+    $stmt = mysqli_prepare($con, $query);
+    mysqli_stmt_execute($stmt);
+    return mysqli_stmt_get_result($stmt);
 }
 
 function getAllSizes($con) {
     $query = "SELECT size_id, size_name FROM sizes ORDER BY size_id ASC";
-    return mysqli_query($con, $query);
+    $stmt = mysqli_prepare($con, $query);
+    mysqli_stmt_execute($stmt);
+    return mysqli_stmt_get_result($stmt);
+}
+
+function getWeeklyRevenueData($con) {
+    $data = ['labels' => [], 'values' => []];
+    $query = "SELECT DATE(o.created_at) as date, SUM(p.amount) as total 
+              FROM orders o
+              JOIN payments p ON o.order_id = p.order_id
+              WHERE o.created_at >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)
+              GROUP BY DATE(o.created_at)
+              ORDER BY DATE(o.created_at) ASC";
+
+    $stmt = mysqli_prepare($con, $query);
+    
+    if ($stmt) {
+        mysqli_stmt_execute($stmt);
+        $result = mysqli_stmt_get_result($stmt);
+        
+        while ($row = mysqli_fetch_assoc($result)) {
+            $data['labels'][] = date("D", strtotime($row['date']));
+            $data['values'][] = (float)$row['total'];
+        }
+        mysqli_stmt_close($stmt);
+    }
+    
+    return $data;
+}
+
+function getOrderStatusData($con) {
+    $data = ['labels' => [], 'values' => []];
+    $query = "SELECT os.order_status_name AS status_name, COUNT(o.order_id) as count 
+              FROM orders o
+              JOIN order_statuses os ON o.order_status_id = os.order_status_id
+              GROUP BY os.order_status_name";
+
+    $stmt = mysqli_prepare($con, $query);
+    if ($stmt) {
+        mysqli_stmt_execute($stmt);
+        $result = mysqli_stmt_get_result($stmt);
+        while ($row = mysqli_fetch_assoc($result)) {
+            $data['labels'][] = $row['status_name'];
+            $data['values'][] = (int)$row['count'];
+        }
+        mysqli_stmt_close($stmt);
+    }
+    return $data;
+}
+
+function getUserGrowthData($con) {
+    $data = ['labels' => [], 'values' => []];
+    $query = "SELECT DATE(created_at) as date, COUNT(user_id) as new_users 
+              FROM users 
+              WHERE created_at >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)
+              GROUP BY DATE(created_at)
+              ORDER BY DATE(created_at) ASC";
+
+    $stmt = mysqli_prepare($con, $query);
+    if ($stmt) {
+        mysqli_stmt_execute($stmt);
+        $result = mysqli_stmt_get_result($stmt);
+        while ($row = mysqli_fetch_assoc($result)) {
+            $data['labels'][] = date("D", strtotime($row['date']));
+            $data['values'][] = (int)$row['new_users'];
+        }
+        mysqli_stmt_close($stmt);
+    }
+    return $data;
+}
+
+function getPaymentMethodData($con) {
+    $data = ['labels' => [], 'values' => []];
+    
+    $query = "SELECT payment_method, COUNT(*) AS count 
+              FROM payments 
+              GROUP BY payment_method";
+
+    $stmt = mysqli_prepare($con, $query);
+    if ($stmt) {
+        mysqli_stmt_execute($stmt);
+        $result = mysqli_stmt_get_result($stmt);
+        
+        while ($row = mysqli_fetch_assoc($result)) {
+            $data['labels'][] = $row['payment_method'] ?? 'Unknown';
+            $data['values'][] = (int)$row['count'];
+        }
+        mysqli_stmt_close($stmt);
+    }
+    return $data;
 }
             
         /*Add all functions here so it can be used by other webpages*/

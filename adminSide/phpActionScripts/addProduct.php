@@ -5,46 +5,66 @@ include_once "sessionCheck.php";
 
 if ($_SERVER['REQUEST_METHOD'] == "POST" && isset($_POST['addProduct'])) {
     
-    // Extract shared form tracking metrics
-    $description = isset($_POST['newProductDescription']) ? mysqli_real_escape_string($con, $_POST['newProductDescription']) : '';
-    $entryType         = $_POST['entryType'] ?? 'new';
+    // 1. Extract inputs
+    $entryType = $_POST['entryType'] ?? 'new';
     $existingProductID = $_POST['productID'] ?? 0;
-    
-    $name              = $_POST['newProductName'] ?? '';
-    $catID             = $_POST['categoryID'] ?? 0;
-    $sizeID            = $_POST['sizeID'] ?? null;
-    $colorID           = $_POST['colorID'] ?? null;
-    $stock             = $_POST['stock'] ?? 0;
-    $price             = $_POST['price'] ?? 0.00;
-    
-    // CHANGED: Check if a description was typed. If not, fallback to a clean blank string or default text.
-    $description       = $_POST['newProductDescription'] ?? ''; 
-    $tierID            = 1; 
+    $name = $_POST['newProductName'] ?? '';
+    $catID = $_POST['categoryID'] ?? 0;
+    $stock = $_POST['stock'] ?? 0;
+    $price = $_POST['price'] ?? 0.00;
+    $description = $_POST['newProductDescription'] ?? ''; 
+    $tierID = 1; 
 
-    // Capture return tracking indicators for interface preservation
-    $page   = $_POST['returnPage'] ?? 1;
+
+    // 2. Capture the TEXT inputs instead of IDs
+    $sizeName = $_POST['sizeName'] ?? 'Default'; 
+    $colorName = $_POST['colorName'] ?? 'Default';
+
+    // 3. Keep your tracking info
+    $page = $_POST['returnPage'] ?? 1;
     $search = $_POST['returnSearch'] ?? '';
     $status = $_POST['returnStatus'] ?? 'activeProducts';
     
-    // Unique item tracker hash key properties sequence definition
     $sku = "SKU-PROD-" . time() . "-" . rand(10, 99);
 
-    // Call centralized logic context function completely isolated in functions.php
-    $executionSuccess = addProductVariant(
-        $con, 
-        $entryType, 
-        $existingProductID, 
-        $name, 
-        $description, // Passes the description from the form safely here!
-        $price,       // Maps to $basePrice (double type)
-        $catID, 
-        $tierID, 
-        $sizeID, 
-        $colorID, 
-        $sku, 
-        $stock,       // Maps to $stock (integer type)
-        $price        // Maps to $priceOverride (double type)
-    );
+    // 4. Pass them to the function
+
+
+$variantImage = ''; 
+if (isset($_FILES['productImage']) && $_FILES['productImage']['error'] === UPLOAD_ERR_OK) {
+    $fileTmpPath = $_FILES['productImage']['tmp_name'];
+    $fileName = $_FILES['productImage']['name'];
+    $newFileName = time() . '_' . $fileName; // This matches your naming convention
+    $uploadPath = '../../Resources/Images/' . $newFileName;
+
+    if (move_uploaded_file($fileTmpPath, $uploadPath)) {
+        $variantImage = $newFileName; // This is what goes into your database
+    }
+}
+
+if (!empty($_POST['categoryName'])) {
+    $finalCatID = getOrAddCategory($con, $_POST['categoryName']);
+} else {
+    $finalCatID = $_POST['categoryID'] ?? 0;
+}
+
+
+$executionSuccess = addProductVariant(
+    $con, 
+    $entryType, 
+    $existingProductID, 
+    $name, 
+    $description, 
+    $price, 
+    $finalCatID, 
+    $tierID, 
+    $sizeName, 
+    $colorName, 
+    $sku, 
+    $stock,   
+    $price,   
+    $variantImage 
+);
 
     if ($executionSuccess) {
         header("Location: ../adminScreens/adminInventory.php?page=$page&searchBar=" . urlencode($search) . "&status=$status&add=success");

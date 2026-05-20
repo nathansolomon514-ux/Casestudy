@@ -95,6 +95,21 @@
         margin-bottom: 40px;
     }
 
+
+.analyticsGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Splits into two equal columns */
+    gap: 20px;
+}
+
+/* Make the chart containers match your statCard style */
+.chartContainer {
+    background: #fff;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
     .statCard {
         background-color: lightgreen;
         flex: 1;

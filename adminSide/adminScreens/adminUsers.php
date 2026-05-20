@@ -9,7 +9,7 @@
 
     $adminSearch = $_GET["searchBar"] ?? "";
 
-    $limit = 2; //rows to return
+    $limit = 10; //rows to return
 
     //rows to show next page
     $page = isset($_GET['page']) ? /*(int)*/$_GET['page'] : 1;
